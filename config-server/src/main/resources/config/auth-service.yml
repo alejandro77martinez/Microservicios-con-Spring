@@ -1,0 +1,16 @@
+server:
+  port: 8085
+  
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://alejandromartineznava77_db_user:jzpnNEAjzVDt1uXH@clusterformicroservices.x9lwerk.mongodb.net/authdb?appName=ClusterForMicroservices
+
+jwt:
+  secret: mi_clave_super_secreta_que_no_debe_ir_en_codigo
+  expiration: 3600000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
