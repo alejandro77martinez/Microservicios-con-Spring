@@ -86,12 +86,11 @@ class UserServiceImpl implements UserService {
                     credentials.getPassword()
                 )
             );
+            UserEntity userEntity = userRepository.findByEmail(credentials.getEmail()).get();
             AuthResponse authResponse = AuthResponse.builder()
                     .token(jwtService.generateToken((UserDetails) auth.getPrincipal()))
-                    .user(credentials.getEmail())
-                    .roles(userRepository.findByEmail(credentials.getEmail())
-                            .map(UserEntity::getRoles)
-                            .orElse(List.of("USER")))
+                    .user(userEntity.getId())
+                    .roles(userEntity.getRoles())
                     .build();
             return authResponse;
         } catch (AuthenticationException e) {
@@ -177,16 +176,20 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<Boolean> validateUser(String token, String email) {
+    public ResponseEntity<Boolean> validateUser(String token, String user) {
         try {
-            return ResponseEntity.ok(validate(token, email));
+            return ResponseEntity.ok(validate(token, user));
         } catch (UserServiceException e) {
             throw new BadRequestException(e.getMessage()); 
         }
     }
 
     private Boolean validate(String token, String user) throws UserServiceException {
-        Boolean isValid = jwtService.validateToken(token, user);
+        Optional<UserEntity> userOp = userRepository.findById(user);
+        if (userOp.isEmpty()) {
+            throw new UserServiceException("Invalid token");
+        }
+        Boolean isValid = jwtService.validateToken(token, userOp.get().getEmail());
         if (!isValid) {
             throw new UserServiceException("Invalid token");
         }

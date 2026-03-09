@@ -44,8 +44,8 @@ public class AuthController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<UserResponse> getUserByEmail(@RequestBody String email) {
-        return userService.findByEmail(email);
+    public ResponseEntity<UserResponse> getUserById(@RequestBody String id) {
+        return userService.findById(id);
     }
 
     @PostMapping("/validate")
