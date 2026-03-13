@@ -13,13 +13,12 @@ El proyecto está construido bajo una arquitectura de microservicios utilizando 
 * **Microservicios de Dominio:** 
     * `service-auth`: Gestión de usuarios y autenticacion.
     * `service-task`: Gestion de tareas.
-    * `service-files`: Gestion de arhcivos.
 
 ## 🛠️ Tecnologías Utilizadas
 
 * **Java 21 OpenJDK+**
 * **Spring Boot 3.5.4**
-* **Spring Cloud (Eureka, Gateway, Config, OpenFeign)**
+* **Spring Cloud (Eureka, Gateway, Config)**
 * **Bases de Datos: MongoDB**
 * **Mensajería: RabbitMQ o Kafka (por definir)**
 * **Docker & Docker Compose**

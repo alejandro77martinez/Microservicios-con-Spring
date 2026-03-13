@@ -14,20 +14,20 @@ import java.util.Optional;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws ResourceNotFoundException {
-       Optional<UserEntity> userOp = userRepository.findByEmail(email);
-        if (userOp.isEmpty()) {
-            throw new ResourceNotFoundException("User not found with email: " + email);
-        }
-        UserEntity user = userOp.get();
-        return User
-                .withUsername(user.getEmail())
-                .password(user.getPassword())
-                .authorities(user.getRoles().toArray(new String[0]))
-                .build();
+  @Override
+  public UserDetails loadUserByUsername(String email) throws ResourceNotFoundException {
+    Optional<UserEntity> userOp = userRepository.findByEmail(email);
+    if (userOp.isEmpty()) {
+      throw new ResourceNotFoundException("User not found with email: " + email);
     }
+    UserEntity user = userOp.get();
+    return User
+      .withUsername(user.getEmail())
+      .password(user.getPassword())
+      .authorities(user.getRoles().toArray(new String[0]))
+      .build();
+  }
 }

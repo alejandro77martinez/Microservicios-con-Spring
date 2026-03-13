@@ -7,7 +7,8 @@ import java.util.List;
 @Data
 @Builder
 public class AuthResponse {
-    private String token;
-    private String user;
-    private List<String> roles;
+
+  private String token;
+  private String user;
+  private List<String> roles;
 }

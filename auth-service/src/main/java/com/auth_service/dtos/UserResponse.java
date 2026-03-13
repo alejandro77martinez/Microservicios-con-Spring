@@ -9,8 +9,9 @@ import java.util.List;
 @Builder
 public class UserResponse {
     
-    private String name;
-    private String lastName;
-    private String email;
-    private List<String> roles;
+  private String id;
+  private String name;
+  private String lastName;
+  private String email;
+  private List<String> roles;
 }

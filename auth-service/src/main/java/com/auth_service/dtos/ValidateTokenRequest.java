@@ -1,12 +1,18 @@
 package com.auth_service.dtos;
 
+
 import lombok.Data;
 import lombok.Builder;
-import java.util.List;
+
+import jakarta.validation.constraints.NotBlank;
 
 @Data
 @Builder
 public class ValidateTokenRequest {
-    private String token;
-    private String user;
+
+  @NotBlank(message = "El token es obligatorio")
+  private String token;
+
+  @NotBlank(message = "El usuario es obligatorio")
+  private String user;
 }

@@ -20,17 +20,17 @@ import java.util.List;
 @Document(collection = "users")
 public class UserEntity {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    private String name;
+  private String name;
 
-    private String lastName;
+  private String lastName;
     
-    @Indexed(unique = true)
-    private String email;
+  @Indexed(unique = true)
+  private String email;
 
-    private String password;
+  private String password;
 
-    private List<String> roles;
+  private List<String> roles;
 }

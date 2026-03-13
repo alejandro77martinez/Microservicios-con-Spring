@@ -29,170 +29,179 @@ import java.util.Optional;
 @Service
 class UserServiceImpl implements UserService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+  @Autowired
+  private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtService jwtService;
+  @Autowired
+  private JwtService jwtService;
 
-    @Override
-    public ResponseEntity<UserResponse> create(RegisterRequest user) {
-        try {
-            return ResponseEntity.created(null).body(saveUser(user));
-        } catch (UserServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+  @Override
+  public ResponseEntity<UserResponse> create(RegisterRequest user) {
+    try {
+      return ResponseEntity.status(201).body(saveUser(user));
+    } catch (UserServiceException e) {
+      throw new BadRequestException(e.getMessage());
     }
+  }
 
-    private UserResponse saveUser(RegisterRequest user) throws UserServiceException {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new UserServiceException("Email already in use");
-        }
-        UserEntity savedUser = userRepository.save(UserEntity.builder()
-                .name(user.getName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .password(passwordEncoder.encode(user.getPassword()))
-                .roles(user.getRoles() == null || user.getRoles().isEmpty() ? List.of("USER") : user.getRoles())
-                .build());        
-        return UserResponse.builder()
-                .name(savedUser.getName())
-                .lastName(savedUser.getLastName())
-                .email(savedUser.getEmail())
-                .roles(savedUser.getRoles())
-                .build();
+  private UserResponse saveUser(RegisterRequest user) throws UserServiceException {
+    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+      throw new UserServiceException("Email already in use");
     }
+    UserEntity newUser = UserEntity.builder()
+      .name(user.getName())
+      .lastName(user.getLastName())
+      .email(user.getEmail())
+      .password(passwordEncoder.encode(user.getPassword()))
+      .roles(user.getRoles() == null || user.getRoles().isEmpty() ? List.of("USER") : user.getRoles())
+      .build();
+    UserEntity savedUser = userRepository.save(newUser);
+    return UserResponse.builder()
+      .id(savedUser.getId())
+      .name(savedUser.getName())
+      .lastName(savedUser.getLastName())
+      .email(savedUser.getEmail())
+      .roles(savedUser.getRoles())
+      .build();
+  }
 
-    @Override
-    public ResponseEntity<AuthResponse> login(LoginRequest user){
-        try {
-            return ResponseEntity.ok(authenticateAndGenerateToken(user));
-        } catch (UserServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+  @Override
+  public ResponseEntity<AuthResponse> login(LoginRequest user) {
+    try {
+      return ResponseEntity.ok(authenticateAndGenerateToken(user));
+    } catch (UserServiceException e) {
+      throw new BadRequestException(e.getMessage());
     }
+  }
 
-    private AuthResponse authenticateAndGenerateToken(LoginRequest credentials) throws UserServiceException {
-        try {
-            Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    credentials.getEmail(), 
-                    credentials.getPassword()
-                )
-            );
-            UserEntity userEntity = userRepository.findByEmail(credentials.getEmail()).get();
-            AuthResponse authResponse = AuthResponse.builder()
-                    .token(jwtService.generateToken((UserDetails) auth.getPrincipal()))
-                    .user(userEntity.getId())
-                    .roles(userEntity.getRoles())
-                    .build();
-            return authResponse;
-        } catch (AuthenticationException e) {
-            throw new UserServiceException(e.getMessage());
-        }
+  private AuthResponse authenticateAndGenerateToken(LoginRequest credentials) throws UserServiceException {
+    try {
+      Authentication auth = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(
+          credentials.getEmail(),
+          credentials.getPassword()));
+      UserEntity userEntity = userRepository.findByEmail(credentials.getEmail()).get();
+      AuthResponse authResponse = AuthResponse.builder()
+        .token(jwtService.generateToken((UserDetails) auth.getPrincipal()))
+        .user(userEntity.getId())
+        .roles(userEntity.getRoles())
+        .build();
+      return authResponse;
+    } catch (AuthenticationException e) {
+      throw new UserServiceException(e.getMessage());
     }
+  }
 
-    @Override
-    public ResponseEntity<List<UserResponse>> findAll() {
-        List<UserResponse> userResponses = mapToUserResponseList();
-        if (userResponses.isEmpty()) {
-            throw new ResourceNotFoundException("No users found");
-        }
-        return ResponseEntity.ok(userResponses);
+  @Override
+  public ResponseEntity<List<UserResponse>> findAll() {
+    List<UserResponse> userResponses = mapToUserResponseList();
+    if (userResponses.isEmpty()) {
+      throw new ResourceNotFoundException("No users found");
     }
+    return ResponseEntity.ok(userResponses);
+  }
 
-    private List<UserResponse> mapToUserResponseList() {
-        List<UserEntity> users = userRepository.findAll();
-        return users.stream().map(user -> UserResponse.builder()
-                .name(user.getName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .roles(user.getRoles())
-                .build()).toList();
-    }
+  private List<UserResponse> mapToUserResponseList() {
+    List<UserEntity> users = userRepository.findAll();
+    return users.stream().map(user -> UserResponse.builder()
+      .name(user.getName())
+      .lastName(user.getLastName())
+      .email(user.getEmail())
+      .roles(user.getRoles())
+      .build()).toList();
+  }
 
-    @Override
-    public ResponseEntity<UserResponse> findById(String id) {
-        try {
-            return ResponseEntity.ok(getById(id));
-        } catch (UserServiceException e) {
-            throw new ResourceNotFoundException(e.getMessage());
-        }
+  @Override
+  public ResponseEntity<UserResponse> findById(String id) {
+    try {
+      return ResponseEntity.ok(getById(id));
+    } catch (UserServiceException e) {
+      throw new ResourceNotFoundException(e.getMessage());
     }
+  }
 
-    private UserResponse getById(String id) throws UserServiceException {
-        Optional<UserEntity> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new UserServiceException("User not found with id: " + id);
-        }
-        UserResponse userResponse = UserResponse.builder()
-                .name(user.get().getName())
-                .lastName(user.get().getLastName())
-                .email(user.get().getEmail())
-                .roles(user.get().getRoles())
-                .build();
-        return userResponse;
+  private UserResponse getById(String id) throws UserServiceException {
+    Optional<UserEntity> user = userRepository.findById(id);
+    if (user.isEmpty()) {
+      throw new UserServiceException("User not found with id: " + id);
     }
+    UserResponse userResponse = UserResponse.builder()
+      .name(user.get().getName())
+      .lastName(user.get().getLastName())
+      .email(user.get().getEmail())
+      .roles(user.get().getRoles())
+      .build();
+    return userResponse;
+  }
 
-    @Override
-    public ResponseEntity<UserResponse> findByEmail(String email) {
-        try {
-            return ResponseEntity.ok(getByEmail(email));
-        } catch (UserServiceException e) {
-            throw new ResourceNotFoundException(e.getMessage());
-        }
+  @Override
+  public ResponseEntity<UserResponse> findByEmail(String email) {
+    try {
+      return ResponseEntity.ok(getByEmail(email));
+    } catch (UserServiceException e) {
+      throw new ResourceNotFoundException(e.getMessage());
     }
+  }
 
-    private UserResponse getByEmail(String email) throws UserServiceException {
-        Optional<UserEntity> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            throw new UserServiceException("User not found with email: " + email);
-        }
-        UserResponse userResponse = UserResponse.builder()
-                .name(user.get().getName())
-                .lastName(user.get().getLastName())
-                .email(user.get().getEmail())
-                .roles(user.get().getRoles())
-                .build();
-        return userResponse;
+  private UserResponse getByEmail(String email) throws UserServiceException {
+    Optional<UserEntity> user = userRepository.findByEmail(email);
+    if (user.isEmpty()) {
+      throw new UserServiceException("User not found with email: " + email);
     }
+    UserResponse userResponse = UserResponse.builder()
+      .name(user.get().getName())
+      .lastName(user.get().getLastName())
+      .email(user.get().getEmail())
+      .roles(user.get().getRoles())
+      .build();
+    return userResponse;
+  }
 
-    @Override
-    public ResponseEntity<UserResponse> update(String id, RegisterRequest user) {
-        // Implementation to update a user by ID
-        return null; // Placeholder
-    }
+  @Override
+  public ResponseEntity<UserResponse> update(String id, RegisterRequest user) {
+    // Implementation to update a user by ID
+    return null; // Placeholder
+  }
 
-    @Override
-    public ResponseEntity<String> deleteById(String id) {
-        // Implementation to delete a user by ID
-        return null; // Placeholder
-    }
+  @Override
+  public ResponseEntity<String> deleteById(String id) {
+    // Implementation to delete a user by ID
+    return null; // Placeholder
+  }
 
-    @Override
-    public ResponseEntity<Boolean> validateUser(String token, String user) {
-        try {
-            return ResponseEntity.ok(validate(token, user));
-        } catch (UserServiceException e) {
-            throw new BadRequestException(e.getMessage()); 
-        }
+  @Override
+  public ResponseEntity<Boolean> validateUser(String token, String user) {
+    try {
+      return ResponseEntity.ok(validate(token, user));
+    } catch (UserServiceException e) {
+      throw new BadRequestException(e.getMessage());
     }
+  }
 
-    private Boolean validate(String token, String user) throws UserServiceException {
-        Optional<UserEntity> userOp = userRepository.findById(user);
-        if (userOp.isEmpty()) {
-            throw new UserServiceException("Invalid token");
-        }
-        Boolean isValid = jwtService.validateToken(token, userOp.get().getEmail());
-        if (!isValid) {
-            throw new UserServiceException("Invalid token");
-        }
-        return isValid;
+  private Boolean validate(String token, String user) throws UserServiceException {
+    Optional<UserEntity> userOp = userRepository.findById(user);
+    if (userOp.isEmpty()) {
+      throw new UserServiceException("Invalid token");
     }
-}       
+    Boolean isValid = jwtService.validateToken(token, userOp.get().getEmail());
+    if (!isValid) {
+      throw new UserServiceException("Invalid token");
+    }
+    return isValid;
+  }
+
+  @Override
+  public ResponseEntity<String> refreshToken(String token) {
+    String newToken = jwtService.refreshToken(token);
+    if (newToken.isEmpty()) {
+      throw new BadRequestException("Invalid or expired token");
+    }
+    return ResponseEntity.ok(newToken);
+  }
+}
