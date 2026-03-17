@@ -24,27 +24,8 @@ class JwtServiceImplTest {
                 "password",
                 List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
-
         String token = jwtService.generateToken(user);
-
-        assertTrue(jwtService.validateToken(token, "user@test.com"));
-    }
-
-    @Test
-    void validateTokenShouldReturnFalseForDifferentUsername() {
-        JwtServiceImpl jwtService = new JwtServiceImpl();
-        ReflectionTestUtils.setField(jwtService, "secret", "12345678901234567890123456789012");
-        ReflectionTestUtils.setField(jwtService, "expiration", 60000L);
-
-        UserDetails user = new User(
-                "user@test.com",
-                "password",
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
-        );
-
-        String token = jwtService.generateToken(user);
-
-        assertFalse(jwtService.validateToken(token, "other@test.com"));
+        assertTrue(jwtService.validateToken(token));
     }
 
     @Test
@@ -52,24 +33,18 @@ class JwtServiceImplTest {
         JwtServiceImpl jwtService = new JwtServiceImpl();
         ReflectionTestUtils.setField(jwtService, "secret", "12345678901234567890123456789012");
         ReflectionTestUtils.setField(jwtService, "expiration", -1000L);
-
         UserDetails user = new User(
-                "user@test.com",
-                "password",
+                "suza.ortiz@gmail.com",
+                "holamundo",
                 List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
-
         String token = jwtService.generateToken(user);
-
-        assertFalse(jwtService.validateToken(token, "user@test.com"));
+        assertFalse(jwtService.validateToken(token));
     }
 
     @Test
     void validateTokenShouldReturnFalseForMalformedToken() {
         JwtServiceImpl jwtService = new JwtServiceImpl();
-        ReflectionTestUtils.setField(jwtService, "secret", "12345678901234567890123456789012");
-        ReflectionTestUtils.setField(jwtService, "expiration", 60000L);
-
-        assertFalse(jwtService.validateToken("not-a-jwt", "user@test.com"));
+        assertFalse(jwtService.validateToken("not-a-jwt"));
     }
 }

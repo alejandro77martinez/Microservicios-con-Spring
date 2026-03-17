@@ -16,13 +16,13 @@ public class AuthValidationClient {
         this.webClientBuilder = webClientBuilder;
     }
 
-    public Mono<Boolean> validateToken(String token, String user) {
+    public Mono<Boolean> validateToken(String token) {
         return webClientBuilder
                 .build()
                 .post()       
-                .uri("lb://auth-service/auth/validate")
+                .uri("lb://auth-service/api/v1/auth/validate")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("token", token, "user", user))
+                .bodyValue(Map.of("token", token))
                 .retrieve()
                 .bodyToMono(Boolean.class);
     }

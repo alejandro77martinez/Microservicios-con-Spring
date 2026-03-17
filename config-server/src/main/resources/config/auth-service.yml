@@ -1,5 +1,7 @@
 server:
   port: 8085
+  servlet:
+    context-path: /api/v1
   
 spring:
   data:
@@ -8,7 +10,7 @@ spring:
 
 jwt:
   secret: mi_clave_super_secreta_que_no_debe_ir_en_codigo
-  expiration: 3600000
+  expiration: 600000
 
 eureka:
   client:

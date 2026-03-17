@@ -3,8 +3,6 @@ package com.auth_service.services.implementations;
 import com.auth_service.models.UserEntity;
 import com.auth_service.dtos.RegisterRequest;
 import com.auth_service.dtos.UserResponse;
-import com.auth_service.dtos.LoginRequest;
-import com.auth_service.dtos.AuthResponse;
 
 import com.auth_service.exceptions.UserServiceException;
 import com.auth_service.exceptions.BadRequestException;
@@ -15,11 +13,6 @@ import com.auth_service.services.interfaces.JwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
 
@@ -28,9 +21,6 @@ import java.util.Optional;
 
 @Service
 class UserServiceImpl implements UserService {
-
-  @Autowired
-  private AuthenticationManager authenticationManager;
 
   @Autowired
   private UserRepository userRepository;
@@ -69,33 +59,6 @@ class UserServiceImpl implements UserService {
       .email(savedUser.getEmail())
       .roles(savedUser.getRoles())
       .build();
-  }
-
-  @Override
-  public ResponseEntity<AuthResponse> login(LoginRequest user) {
-    try {
-      return ResponseEntity.ok(authenticateAndGenerateToken(user));
-    } catch (UserServiceException e) {
-      throw new BadRequestException(e.getMessage());
-    }
-  }
-
-  private AuthResponse authenticateAndGenerateToken(LoginRequest credentials) throws UserServiceException {
-    try {
-      Authentication auth = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-          credentials.getEmail(),
-          credentials.getPassword()));
-      UserEntity userEntity = userRepository.findByEmail(credentials.getEmail()).get();
-      AuthResponse authResponse = AuthResponse.builder()
-        .token(jwtService.generateToken((UserDetails) auth.getPrincipal()))
-        .user(userEntity.getId())
-        .roles(userEntity.getRoles())
-        .build();
-      return authResponse;
-    } catch (AuthenticationException e) {
-      throw new UserServiceException(e.getMessage());
-    }
   }
 
   @Override
@@ -173,35 +136,5 @@ class UserServiceImpl implements UserService {
   public ResponseEntity<String> deleteById(String id) {
     // Implementation to delete a user by ID
     return null; // Placeholder
-  }
-
-  @Override
-  public ResponseEntity<Boolean> validateUser(String token, String user) {
-    try {
-      return ResponseEntity.ok(validate(token, user));
-    } catch (UserServiceException e) {
-      throw new BadRequestException(e.getMessage());
-    }
-  }
-
-  private Boolean validate(String token, String user) throws UserServiceException {
-    Optional<UserEntity> userOp = userRepository.findById(user);
-    if (userOp.isEmpty()) {
-      throw new UserServiceException("Invalid token");
-    }
-    Boolean isValid = jwtService.validateToken(token, userOp.get().getEmail());
-    if (!isValid) {
-      throw new UserServiceException("Invalid token");
-    }
-    return isValid;
-  }
-
-  @Override
-  public ResponseEntity<String> refreshToken(String token) {
-    String newToken = jwtService.refreshToken(token);
-    if (newToken.isEmpty()) {
-      throw new BadRequestException("Invalid or expired token");
-    }
-    return ResponseEntity.ok(newToken);
   }
 }

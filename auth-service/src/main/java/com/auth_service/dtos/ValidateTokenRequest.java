@@ -13,6 +13,4 @@ public class ValidateTokenRequest {
   @NotBlank(message = "El token es obligatorio")
   private String token;
 
-  @NotBlank(message = "El usuario es obligatorio")
-  private String user;
 }
