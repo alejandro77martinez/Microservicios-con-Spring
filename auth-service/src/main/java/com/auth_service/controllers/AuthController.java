@@ -32,13 +32,13 @@ public class AuthController {
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<String> refreshToken(@RequestBody String token) {
-    return authService.refreshToken(token);
+  public ResponseEntity<String> refreshToken(@Valid @RequestBody ValidateTokenRequest request) {
+    return authService.refreshToken(request.getToken());
   }
 
   @PostMapping("/session")
-  public ResponseEntity<UserResponse> getUserSession(@RequestBody String token) {
-    return authService.getUserLogged(token);
+  public ResponseEntity<UserResponse> getUserSession(@Valid @RequestBody ValidateTokenRequest request) {
+    return authService.getUserLogged(request.getToken());
   }
 
   @PostMapping("/logout")

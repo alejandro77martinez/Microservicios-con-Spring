@@ -18,45 +18,48 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
-    @Mock
-    private AuthService userService;
+  @Mock
+  private AuthService userService;
 
-    @InjectMocks
-    private AuthController controller;
+  @InjectMocks
+  private AuthController controller;
 
-    @Test
-    void loginShouldDelegateToUserService() {
-        LoginRequest request = LoginRequest.builder().email("user@test.com").password("secret").build();
-        when(userService.login(request)).thenReturn(ResponseEntity.ok("Login successful"));
+  @Test
+  void loginShouldDelegateToUserService() {
+    LoginRequest request = LoginRequest.builder().email("user@test.com").password("secret").build();
+    when(userService.login(request)).thenReturn(ResponseEntity.ok("Login successful"));
 
-        ResponseEntity<String> response = controller.login(request);
+    ResponseEntity<String> response = controller.login(request);
 
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals("Login successful", response.getBody());
-        verify(userService).login(request);
-    }
+    assertEquals(200, response.getStatusCode().value());
+    assertEquals("Login successful", response.getBody());
+    verify(userService).login(request);
+  }
 
-    @Test
-    void validateUserShouldDelegateToUserService() {
-        ValidateTokenRequest request = ValidateTokenRequest.builder()
-                .token("token")
-                .build();
-        when(userService.validateUser("token")).thenReturn(ResponseEntity.ok(true));
+  @Test
+  void validateUserShouldDelegateToUserService() {
+    ValidateTokenRequest request = ValidateTokenRequest.builder()
+      .token("token")
+      .build();
+    when(userService.validateUser("token")).thenReturn(ResponseEntity.ok(true));
 
-        ResponseEntity<Boolean> response = controller.validateUser(request);
+    ResponseEntity<Boolean> response = controller.validateUser(request);
 
-        assertTrue(response.getBody());
-        verify(userService).validateUser("token");
-    }
+    assertTrue(response.getBody());
+    verify(userService).validateUser("token");
+  }
 
-    @Test
-    void refreshTokenShouldDelegateToUserService() {
-        when(userService.refreshToken("token")).thenReturn(ResponseEntity.ok("new-token"));
+  @Test
+  void refreshTokenShouldDelegateToUserService() {
+    ValidateTokenRequest mockToken = ValidateTokenRequest.builder()
+      .token("token")
+      .build(); 
+    when(userService.refreshToken("token")).thenReturn(ResponseEntity.ok("new-token"));
 
-        ResponseEntity<String> response = controller.refreshToken("token");
+    ResponseEntity<String> response = controller.refreshToken(mockToken);
 
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals("new-token", response.getBody());
-        verify(userService).refreshToken("token");
-    }
+    assertEquals(200, response.getStatusCode().value());
+    assertEquals("new-token", response.getBody());
+    verify(userService).refreshToken("token");
+  }
 }

@@ -14,4 +14,5 @@ public interface UserService {
   ResponseEntity<UserResponse> findByEmail(String email);
   ResponseEntity<UserResponse> update(String id, RegisterRequest user);
   ResponseEntity<String> deleteById(String id); 
+  ResponseEntity<Boolean> existUserName(String name);
 }

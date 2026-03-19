@@ -1,10 +1,10 @@
 # 🚀 Microservicios-con-Spring 
 
-Sistema backend de una aplicacion web para la gestion tareas de un proyecto y que ademnas implementa un servicio de autenticacion, y gestion de archivos.
+Sistema backend de la aplicacion web -AdminTask- para la gestion de tareas de proyectos usando el marco de trabajo kanban. Este cuenta con la implementa un servicio de autenticacion usando cookies y JWT, un servicio para la gestion del proyecto y otro para la gestion de tareas.
 
 ## 🏛 Arquitectura del Sistema
 
-El proyecto está construido bajo una arquitectura de microservicios utilizando el ecosistema de **Spring Cloud**.
+El proyecto está construido bajo una arquitectura en microservicios utilizando el ecosistema de **Spring Cloud**.
 
 ### 📦 Componentes Principales:
 * **Config Server:** Gestión centralizada de configuraciones (Spring Cloud Config).
@@ -13,6 +13,7 @@ El proyecto está construido bajo una arquitectura de microservicios utilizando 
 * **Microservicios de Dominio:** 
     * `service-auth`: Gestión de usuarios y autenticacion.
     * `service-task`: Gestion de tareas.
+    * `service-project`: Gestion de proyectos.
 
 ## 🛠️ Tecnologías Utilizadas
 

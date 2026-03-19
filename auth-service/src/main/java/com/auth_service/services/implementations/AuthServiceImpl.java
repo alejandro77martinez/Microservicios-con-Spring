@@ -16,9 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.auth_service.dtos.LoginRequest;
 import com.auth_service.dtos.UserResponse;
+import com.auth_service.exceptions.AuthServiceException;
 import com.auth_service.exceptions.BadRequestException;
 import com.auth_service.exceptions.ResourceNotFoundException;
-import com.auth_service.exceptions.UserServiceException;
 import com.auth_service.models.UserEntity;
 import com.auth_service.repositories.UserRepository;
 import com.auth_service.services.interfaces.AuthService;
@@ -40,12 +40,12 @@ public class AuthServiceImpl implements AuthService {
       return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, authenticateAndGenerateCookieWithToken(user).toString())
         .body("Login successful");
-    } catch (UserServiceException e) {
+    } catch (AuthServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
   }
 
-  private ResponseCookie authenticateAndGenerateCookieWithToken(LoginRequest credentials) throws UserServiceException {
+  private ResponseCookie authenticateAndGenerateCookieWithToken(LoginRequest credentials) throws AuthServiceException {
     try {
       Authentication auth = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
         .sameSite("Lax") // "None" si frontend y backend están en dominios diferentes
         .build();
     } catch (AuthenticationException e) {
-      throw new UserServiceException(e.getMessage());
+      throw new AuthServiceException(e.getMessage());
     }
   }
   
@@ -70,43 +70,59 @@ public class AuthServiceImpl implements AuthService {
   public ResponseEntity<Boolean> validateUser(String token) {
     try {
       return ResponseEntity.ok(validate(token));
-    } catch (UserServiceException e) {
+    } catch (AuthServiceException e) {
       System.out.println("Token Invalido!!!");
       return ResponseEntity.ok(false);
     }
   }
 
-  private Boolean validate(String token) throws UserServiceException {
+  private Boolean validate(String token) throws AuthServiceException {
     Boolean isValid = jwtService.validateToken(token);
     if (!isValid) {
-      throw new UserServiceException("Invalid token");
+      throw new AuthServiceException("Invalid token");
     }
     return isValid;
   }
 
   @Override
   public ResponseEntity<String> refreshToken(String token) {
+    try {
+      return ResponseEntity.ok()
+        .header(HttpHeaders.SET_COOKIE, refrehCookieToken(token).toString())
+        .body("Refresh successful");
+    } catch (AuthServiceException e) {
+      throw new BadRequestException(e.getMessage());
+    }
+  }
+
+  private ResponseCookie refrehCookieToken(String token) throws AuthServiceException{
     String newToken = jwtService.refreshToken(token);
     if (newToken.isEmpty()) {
-      throw new BadRequestException("Invalid or expired token");
+      throw new AuthServiceException("Invalid or expired token");
     }
-    return ResponseEntity.ok(newToken);
+    return ResponseCookie.from("AUTH_TOKEN", newToken)
+      .httpOnly(true)
+      .secure(false) // Set to true in production with HTTPS
+      .path("/")
+      .maxAge(10 * 60) // 10 minutes
+      .sameSite("Lax") // "None" si frontend y backend están en dominios diferentes
+      .build();
   }
 
   @Override
   public ResponseEntity<UserResponse> getUserLogged(String token) {
     try {
       return ResponseEntity.ok(getUserLoggedFromToken(token));
-    } catch (UserServiceException e) {
+    } catch (AuthServiceException e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
   }
 
-  private UserResponse getUserLoggedFromToken(String token) throws UserServiceException {
+  private UserResponse getUserLoggedFromToken(String token) throws AuthServiceException {
     String email = jwtService.getUserFromToken(token);
     Optional<UserEntity> user = userRepository.findByEmail(email);
     if (user.isEmpty()) {
-      throw new UserServiceException("User not found with email: " + email);
+      throw new AuthServiceException("User not found with email: " + email);
     }
     return UserResponse.builder()
       .name(user.get().getName())
@@ -122,12 +138,12 @@ public class AuthServiceImpl implements AuthService {
       return ResponseEntity.ok()
       .header(HttpHeaders.SET_COOKIE, deleteAccessTokenCookie().toString())
       .body("Logout successful");
-    } catch (UserServiceException e) {
+    } catch (AuthServiceException e) {
       throw new BadRequestException("Logout error");
     }
   }
 
-  private ResponseCookie deleteAccessTokenCookie() throws UserServiceException {
+  private ResponseCookie deleteAccessTokenCookie() throws AuthServiceException {
     try {
       SecurityContextHolder.clearContext();
       return ResponseCookie.from("AUTH_TOKEN","")
@@ -136,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
         .maxAge(0)
         .build();
     } catch (AuthenticationException e) {
-      throw new UserServiceException(e.getMessage());
+      throw new AuthServiceException(e.getMessage());
     }
   }
 }

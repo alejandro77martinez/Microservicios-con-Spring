@@ -9,7 +9,6 @@ import com.auth_service.exceptions.BadRequestException;
 import com.auth_service.exceptions.ResourceNotFoundException;
 import com.auth_service.repositories.UserRepository;
 import com.auth_service.services.interfaces.UserService;
-import com.auth_service.services.interfaces.JwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,9 +26,6 @@ class UserServiceImpl implements UserService {
 
   @Autowired
   private PasswordEncoder passwordEncoder;
-
-  @Autowired
-  private JwtService jwtService;
 
   @Override
   public ResponseEntity<UserResponse> create(RegisterRequest user) {
@@ -73,6 +69,7 @@ class UserServiceImpl implements UserService {
   private List<UserResponse> mapToUserResponseList() {
     List<UserEntity> users = userRepository.findAll();
     return users.stream().map(user -> UserResponse.builder()
+      .id(user.getId())
       .name(user.getName())
       .lastName(user.getLastName())
       .email(user.getEmail())
@@ -95,6 +92,7 @@ class UserServiceImpl implements UserService {
       throw new UserServiceException("User not found with id: " + id);
     }
     UserResponse userResponse = UserResponse.builder()
+      .id(user.get().getId())
       .name(user.get().getName())
       .lastName(user.get().getLastName())
       .email(user.get().getEmail())
@@ -118,6 +116,7 @@ class UserServiceImpl implements UserService {
       throw new UserServiceException("User not found with email: " + email);
     }
     UserResponse userResponse = UserResponse.builder()
+      .id(user.get().getId())
       .name(user.get().getName())
       .lastName(user.get().getLastName())
       .email(user.get().getEmail())
@@ -136,5 +135,14 @@ class UserServiceImpl implements UserService {
   public ResponseEntity<String> deleteById(String id) {
     // Implementation to delete a user by ID
     return null; // Placeholder
+  }
+
+  @Override
+  public ResponseEntity<Boolean> existUserName(String name) {
+    if (name == null){
+      throw new BadRequestException("Sin user name");
+    }
+    Optional<UserEntity> user = userRepository.findByEmail(name);
+    return ResponseEntity.ok(!user.isEmpty());
   }
 }

@@ -7,12 +7,23 @@ import java.util.function.Predicate;
 
 @Component
 public class RouterValidator {
-    public static final List<String> OPEN_API_ENDPOINTS = List.of(
-        "api/v1/auth/login",
-        "api/v1/user/register"
-    );
 
-    public Predicate<ServerHttpRequest> isSecured = request -> 
-        OPEN_API_ENDPOINTS.stream()
-            .noneMatch(uri -> request.getURI().getPath().startsWith(uri));
+  public static final List<String> OPEN_API_ENDPOINTS = List.of(
+    "/api/v1/auth/login",
+    "/api/v1/user/register",
+    "/api/v1/user/exist"
+  );
+
+  public static final List<String> COOKIE_TOKEN_BODY_ENDPOINTS = List.of(
+    "/api/v1/auth/refresh",
+    "/api/v1/auth/session"
+  );
+
+  public Predicate<ServerHttpRequest> isSecured = request -> 
+    OPEN_API_ENDPOINTS.stream()
+      .noneMatch(uri -> request.getURI().getPath().startsWith(uri));
+
+  public Predicate<ServerHttpRequest> shouldInjectCookieTokenIntoBody = request ->
+    COOKIE_TOKEN_BODY_ENDPOINTS.stream()
+      .anyMatch(uri -> request.getURI().getPath().startsWith(uri));
 }

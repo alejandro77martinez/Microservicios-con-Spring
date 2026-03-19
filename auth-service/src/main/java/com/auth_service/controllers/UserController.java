@@ -38,4 +38,9 @@ public class UserController {
   public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
     return userService.findById(id);
   }
+
+  @PostMapping("/exist")
+  public ResponseEntity<Boolean> existUserName(@RequestBody String userName){
+    return userService.existUserName(userName);
+  }
 }
