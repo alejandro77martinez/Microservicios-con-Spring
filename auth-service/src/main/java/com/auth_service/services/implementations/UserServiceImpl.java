@@ -21,11 +21,16 @@ import java.util.Optional;
 @Service
 class UserServiceImpl implements UserService {
 
-  @Autowired
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Autowired
-  private PasswordEncoder passwordEncoder;
+  public UserServiceImpl (
+    UserRepository userRepository,
+    PasswordEncoder passwordEncoder){
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
 
   @Override
   public ResponseEntity<UserResponse> create(RegisterRequest user) {
@@ -91,14 +96,13 @@ class UserServiceImpl implements UserService {
     if (user.isEmpty()) {
       throw new UserServiceException("User not found with id: " + id);
     }
-    UserResponse userResponse = UserResponse.builder()
+    return UserResponse.builder()
       .id(user.get().getId())
       .name(user.get().getName())
       .lastName(user.get().getLastName())
       .email(user.get().getEmail())
       .roles(user.get().getRoles())
       .build();
-    return userResponse;
   }
 
   @Override
@@ -115,14 +119,13 @@ class UserServiceImpl implements UserService {
     if (user.isEmpty()) {
       throw new UserServiceException("User not found with email: " + email);
     }
-    UserResponse userResponse = UserResponse.builder()
+    return UserResponse.builder()
       .id(user.get().getId())
       .name(user.get().getName())
       .lastName(user.get().getLastName())
       .email(user.get().getEmail())
       .roles(user.get().getRoles())
       .build();
-    return userResponse;
   }
 
   @Override

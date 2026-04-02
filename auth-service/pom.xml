@@ -29,6 +29,35 @@
 	<properties>
 		<java.version>21</java.version>
 		<spring-cloud.version>2025.0.0</spring-cloud.version>
+		<springdoc-openapi.version>2.8.16</springdoc-openapi.version>
+    <sonar.organization>alejandro77martinez</sonar.organization>
+    <!-- ===== SonarQube ===== -->
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.projectKey>alejandro77martinez_Microservicios-con-Spring</sonar.projectKey>
+    <sonar.projectName>Microservicio Auth Service</sonar.projectName>
+    <sonar.java.source>21</sonar.java.source>
+     <!-- Apuntar al XML que genera JaCoCo -->
+    <sonar.coverage.jacoco.xmlReportPaths>
+        ${project.build.directory}/site/jacoco/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
+
+    <!-- Exclusiones de análisis de código -->
+    <sonar.exclusions>
+        **/TuAppApplication.java,
+        **/*$$SpringCGLIB$$*.java,
+        **/dtos/**,
+        **/models/**,
+    </sonar.exclusions>
+
+    <!-- Exclusiones de cobertura -->
+    <sonar.coverage.exclusions>
+        **/TuAppApplication.java,
+        **/*$$SpringCGLIB$$*.java,
+        **/dtos/**,
+        **/models/**,
+        **/config/**,
+        **/exceptions/**,
+    </sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -71,6 +100,11 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc-openapi.version}</version>
 		</dependency>
 
 		<dependency>
@@ -127,6 +161,63 @@
 					</excludes>
 				</configuration>
 			</plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.12</version>
+        <configuration>
+          <!-- Exclusiones globales aplicadas a todas las ejecuciones -->
+          <excludes>
+            <!-- Clase principal de Spring Boot -->
+            <exclude>**/AuthServiceApplication .class</exclude>
+
+            <!-- Proxies generados por Spring CGLIB (Spring Boot 3.x) -->
+            <exclude>**/*$$SpringCGLIB$$*.class</exclude>
+            <exclude>**/*$$EnhancerBySpringCGLIB$$*.class</exclude>
+
+            <!-- DTOs / Records -->
+            <exclude>**/dtos/**</exclude>
+
+            <!-- Entidades / modelos -->
+            <exclude>**/models/**</exclude>
+      
+            <!-- Configuraciones de Spring -->
+            <exclude>**/config/**</exclude>
+
+            <!-- Excepciones personalizadas -->
+            
+            <exclude>**/exceptions/**</exclude>
+
+          </excludes>
+        </configuration>
+        <executions>
+        <!-- Paso 1: preparar el agente antes de los tests -->
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+
+          <!-- Paso 2: generar reporte después de los tests -->
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+
+          <!-- Paso 3 (opcional): forzar un mínimo de cobertura -->
+  
+        </executions>
+      </plugin>
+      <!-- ===== SonarQube ===== -->
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>4.0.0.4121</version>
+      </plugin>
 		</plugins>
 	</build>
 

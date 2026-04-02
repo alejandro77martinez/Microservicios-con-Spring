@@ -1,6 +1,6 @@
 # 🚀 Microservicios-con-Spring 
 
-Sistema backend de la aplicacion web -AdminTask- para la gestion de tareas de proyectos usando el marco de trabajo kanban. Este cuenta con la implementa un servicio de autenticacion usando cookies y JWT, un servicio para la gestion del proyecto y otro para la gestion de tareas.
+Sistema backend de la aplicacion web -TaskManager- para la gestion de tareas de proyectos usando el marco de trabajo kanban. Este cuenta con la implementa un servicio de autenticacion usando cookies y JWT, un servicio para la gestion del proyecto y otro para la gestion de tareas.
 
 ## 🏛 Arquitectura del Sistema
 

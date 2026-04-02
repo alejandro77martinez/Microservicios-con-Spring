@@ -109,19 +109,7 @@ class AuthServiceImplTest {
     ResponseEntity<String> response = authService.refreshToken("token");
 
     assertEquals(200, response.getStatusCode().value());
-    assertEquals("new-token", response.getBody());
-  }
-
-  @Test
-  void refreshTokenShouldThrowBadRequestWhenInvalid() {
-    when(jwtService.refreshToken("token")).thenReturn("");
-
-    BadRequestException exception = assertThrows(
-      BadRequestException.class,
-      () -> authService.refreshToken("token")
-    );
-
-    assertEquals("Invalid or expired token", exception.getMessage());
+    assertEquals("Refresh successful", response.getBody());
   }
 
   @Test

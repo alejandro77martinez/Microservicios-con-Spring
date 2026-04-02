@@ -1,8 +1,10 @@
 package com.auth_service.services.implementations;
 
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +29,25 @@ import com.auth_service.services.interfaces.JwtService;
 @Service
 public class AuthServiceImpl implements AuthService {
 
+  @Value("${app.cookie.secure}")  // false por defecto en local
+  private boolean secureCookie;
+  @Value("${app.cookie.same-site}") // Lax por defecto en local
+  private String sameSite;
+  private final AuthenticationManager authenticationManager;
+  private final JwtService jwtService;
+  private final UserRepository userRepository;
+  private final String KEY_TOKEN = "AUTH_TOKEN";
+  private final Logger logger = Logger.getLogger(getClass().getName());
+
   @Autowired
-  private AuthenticationManager authenticationManager;
-  @Autowired
-  private JwtService jwtService;
-  @Autowired
-  private UserRepository userRepository;
+  public AuthServiceImpl(
+    AuthenticationManager authenticationManager, 
+    JwtService jwtService, 
+    UserRepository userRepository) {
+    this.authenticationManager = authenticationManager;
+    this.jwtService = jwtService;
+    this.userRepository = userRepository; 
+  }
 
   @Override
   public ResponseEntity<String> login(LoginRequest user) {
@@ -54,12 +69,12 @@ public class AuthServiceImpl implements AuthService {
         )
       );
       String token = jwtService.generateToken((UserDetails) auth.getPrincipal());
-      return ResponseCookie.from("AUTH_TOKEN", token.isEmpty() ? "" : token)
+      return ResponseCookie.from(KEY_TOKEN, token.isEmpty() ? "" : token)
         .httpOnly(true)
-        .secure(false) // Set to true in production with HTTPS
+        .secure(secureCookie) // Set to true in production with HTTPS
         .path("/")
-        .maxAge(10 * 60) // 10 minutes
-        .sameSite("Lax") // "None" si frontend y backend están en dominios diferentes
+        .maxAge(600) // 10 minutes
+        .sameSite(sameSite) // "None" si frontend y backend están en dominios diferentes
         .build();
     } catch (AuthenticationException e) {
       throw new AuthServiceException(e.getMessage());
@@ -71,14 +86,14 @@ public class AuthServiceImpl implements AuthService {
     try {
       return ResponseEntity.ok(validate(token));
     } catch (AuthServiceException e) {
-      System.out.println("Token Invalido!!!");
+      logger.info("Token Invalido!!!");
       return ResponseEntity.ok(false);
     }
   }
 
   private Boolean validate(String token) throws AuthServiceException {
     Boolean isValid = jwtService.validateToken(token);
-    if (!isValid) {
+    if (Boolean.FALSE.equals(isValid)) {
       throw new AuthServiceException("Invalid token");
     }
     return isValid;
@@ -90,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
       return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, refrehCookieToken(token).toString())
         .body("Refresh successful");
-    } catch (AuthServiceException e) {
+    } catch (Exception e) {
       throw new BadRequestException(e.getMessage());
     }
   }
@@ -98,14 +113,14 @@ public class AuthServiceImpl implements AuthService {
   private ResponseCookie refrehCookieToken(String token) throws AuthServiceException{
     String newToken = jwtService.refreshToken(token);
     if (newToken.isEmpty()) {
-      throw new AuthServiceException("Invalid or expired token");
+      return deleteAccessTokenCookie();
     }
-    return ResponseCookie.from("AUTH_TOKEN", newToken)
+    return ResponseCookie.from(KEY_TOKEN, newToken)
       .httpOnly(true)
-      .secure(false) // Set to true in production with HTTPS
+      .secure(secureCookie) // Set to true in production with HTTPS
       .path("/")
-      .maxAge(10 * 60) // 10 minutes
-      .sameSite("Lax") // "None" si frontend y backend están en dominios diferentes
+      .maxAge(600) // 10 minutes
+      .sameSite(sameSite) // "None" si frontend y backend están en dominios diferentes
       .build();
   }
 
@@ -146,8 +161,10 @@ public class AuthServiceImpl implements AuthService {
   private ResponseCookie deleteAccessTokenCookie() throws AuthServiceException {
     try {
       SecurityContextHolder.clearContext();
-      return ResponseCookie.from("AUTH_TOKEN","")
+      return ResponseCookie.from(KEY_TOKEN,"")
         .httpOnly(true)
+        .secure(secureCookie) // Set to true in production with HTTPS
+        .sameSite(sameSite) // "None" si frontend y backend están en dominios diferentes
         .path("/")
         .maxAge(0)
         .build();

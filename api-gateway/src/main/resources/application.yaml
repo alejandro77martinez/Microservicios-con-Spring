@@ -2,4 +2,9 @@ spring:
   application:
     name: api-gateway
   config:
-    import: "optional:configserver:http://localhost:8888"
+    import: "optional:configserver:http://${CONFIG_SERVER_HOST:localhost}:8888"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${SERVICE_REGISTRY_HOST:localhost}:8761/eureka/

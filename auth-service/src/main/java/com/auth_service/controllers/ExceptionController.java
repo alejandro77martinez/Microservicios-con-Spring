@@ -76,7 +76,7 @@ public class ExceptionController {
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .body(ErrorResponse.builder()
       .status(500)
-      .message(ex.getMessage())
+      .message("Error de backend: "+ ex.getMessage())
       .timestamp(new Date())
       .build());
   }

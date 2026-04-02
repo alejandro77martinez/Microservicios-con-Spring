@@ -20,11 +20,13 @@ public class JwtServiceImpl implements JwtService {
   @Value("${jwt.expiration}")
   private long expiration;
 
+  private final String KEY_ROLES = "roles";
+
   @Override
   public String generateToken(UserDetails user) {
     return Jwts.builder()
       .setSubject(user.getUsername())
-      .claim("roles", user.getAuthorities())
+      .claim(KEY_ROLES, user.getAuthorities())
       .setIssuedAt(new Date())
       .setExpiration(new Date(System.currentTimeMillis() + expiration))
       .signWith(getKey(), SignatureAlgorithm.HS256)
@@ -56,13 +58,13 @@ public class JwtServiceImpl implements JwtService {
 
   private boolean isTokenExpired(String token) {
     try {
-      final Date expiration = Jwts.parserBuilder()
+      final Date expirationDate = Jwts.parserBuilder()
         .setSigningKey(getKey())
         .build()
         .parseClaimsJws(token)
         .getBody()
         .getExpiration();
-      return expiration.before(new Date());
+      return expirationDate.before(new Date());
     } catch (Exception e) {
       return true; // Treat invalid token as expired
     }
@@ -89,7 +91,7 @@ public class JwtServiceImpl implements JwtService {
 
       return Jwts.builder()
         .setSubject(claims.getSubject())
-        .claim("roles", claims.get("roles"))
+        .claim(KEY_ROLES, claims.get(KEY_ROLES))
         .setIssuedAt(now)
         .setExpiration(new Date(now.getTime() + expiration))
         .signWith(getKey(), SignatureAlgorithm.HS256)

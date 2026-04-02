@@ -5,6 +5,6 @@ import org.junit.jupiter.api.Test;
 class AuthServiceApplicationTests {
 
     @Test
-    void contextLoads() {
+    void contextLoads() {  // default implementation ignored
     }
 }

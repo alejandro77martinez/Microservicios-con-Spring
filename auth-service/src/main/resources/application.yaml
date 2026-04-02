@@ -1,5 +1,23 @@
 spring:
   application:
     name: auth-service
+  data:
+    mongodb:
+      uri: ${MONGO_DB_URI}
   config:
-    import: "optional:configserver:http://localhost:8888"
+    import: "optional:configserver:http://${CONFIG_SERVER_HOST:localhost}:8888"
+
+jwt:
+  secret: ${JWT_SECRET:mi_clave_super_secreta_que_no_debe_ir_en_codigo}
+  expiration: 600000
+
+app:
+  cookie:
+    secure: ${APP_COOKIE_SECURE:false} # false por defecto en local
+    same-site: ${APP_COOKIE_SAME_SITE:Lax} # Lax por defecto en local
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${SERVICE_REGISTRY_HOST:localhost}:8761/eureka/
+
