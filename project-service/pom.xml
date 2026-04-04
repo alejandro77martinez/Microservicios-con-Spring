@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.4</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.project-service</groupId>
+	<artifactId>project-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>project-service</name>
+	<description>Project service project for Spring Boot</description>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>21</java.version>
+		<spring-cloud.version>2025.0.0</spring-cloud.version>
+    <springdoc-openapi.version>2.8.16</springdoc-openapi.version>
+    <sonar.organization>alejandro77martinez</sonar.organization>
+    <!-- ===== SonarQube ===== -->
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.projectKey>alejandro77martinez_Microservicios-con-Spring</sonar.projectKey>
+    <sonar.projectName>Microservicio Project Service</sonar.projectName>
+    <sonar.java.source>21</sonar.java.source>
+     <!-- Apuntar al XML que genera JaCoCo -->
+    <sonar.coverage.jacoco.xmlReportPaths>
+        ${project.build.directory}/site/jacoco/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
+
+    <!-- Exclusiones de análisis de código -->
+    <sonar.exclusions>
+        **/TuAppApplication.java,
+        **/*$$SpringCGLIB$$*.java,
+        **/dtos/**,
+        **/models/**,
+    </sonar.exclusions>
+
+    <!-- Exclusiones de cobertura -->
+    <sonar.coverage.exclusions>
+        **/TuAppApplication.java,
+        **/*$$SpringCGLIB$$*.java,
+        **/dtos/**,
+        **/models/**,
+        **/config/**,
+        **/exceptions/**,
+    </sonar.coverage.exclusions>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc-openapi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.12</version>
+        <configuration>
+          <!-- Exclusiones globales aplicadas a todas las ejecuciones -->
+          <excludes>
+            <!-- Clase principal de Spring Boot -->
+            <exclude>**/AuthServiceApplication .class</exclude>
+
+            <!-- Proxies generados por Spring CGLIB (Spring Boot 3.x) -->
+            <exclude>**/*$$SpringCGLIB$$*.class</exclude>
+            <exclude>**/*$$EnhancerBySpringCGLIB$$*.class</exclude>
+
+            <!-- DTOs / Records -->
+            <exclude>**/dtos/**</exclude>
+
+            <!-- Entidades / modelos -->
+            <exclude>**/models/**</exclude>
+      
+            <!-- Configuraciones de Spring -->
+            <exclude>**/config/**</exclude>
+
+            <!-- Excepciones personalizadas -->
+            
+            <exclude>**/exceptions/**</exclude>
+
+          </excludes>
+        </configuration>
+        <executions>
+        <!-- Paso 1: preparar el agente antes de los tests -->
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+
+          <!-- Paso 2: generar reporte después de los tests -->
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+
+          <!-- Paso 3 (opcional): forzar un mínimo de cobertura -->
+  
+        </executions>
+      </plugin>
+      <!-- ===== SonarQube ===== -->
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>4.0.0.4121</version>
+      </plugin>
+		</plugins>
+	</build>
+
+</project>
