@@ -20,36 +20,34 @@ import java.util.List;
 @NoArgsConstructor
 @Document(collection = "projects")
 public class ProjectEntity {
-  
-    @Id
-    private String id;
 
-    @Indexed(unique = true)
-    private String name;
+  @Id
+  private String id;
 
-    private String client;
+  @Indexed(unique = true)
+  private String name;
 
-    private String summary;
+  private String client;
 
-    private String priority;
+  private String summary;
 
-    private String health;
+  private String priority;
 
-    private Number progress;
+  private String health;
 
-    private String methodology;
+  private Number progress;
 
-    private Date createdDate;
+  private String methodology;
 
-    private Date startDate;
+  private Date createdDate;
 
-    private Date dueDate;
+  private Date startDate;
 
-    private List<String> tags;
+  private Date dueDate;
 
-    private List<String> tasks;
+  private List<String> tags;
 
-    private RoleUserEntity userCreated;
+  private RoleUserEntity userCreated;
 
-    private List<RoleUserEntity> teamMembers;
+  private List<RoleUserEntity> teamMembers;
 }

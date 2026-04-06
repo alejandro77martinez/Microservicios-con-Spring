@@ -3,7 +3,9 @@ package com.project_service.services.implementations;
 import com.project_service.dtos.*;
 import com.project_service.exceptions.BadRequestException;
 import com.project_service.exceptions.ProjectServiceException;
+import com.project_service.exceptions.ResourceNotFoundException;
 import com.project_service.models.ProjectEntity;
+import com.project_service.models.RoleUserEntity;
 import com.project_service.repositories.ProjectRepository;
 import com.project_service.services.interfaces.ProjectCrudService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +14,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectCrudServiceImpl implements ProjectCrudService {
 
+
+  private final ProjectRepository projectRepository;
+
   @Autowired
-  private ProjectRepository projectRepository;
+  public ProjectCrudServiceImpl(ProjectRepository projectRepository) {
+    this.projectRepository = projectRepository;
+  }
 
   @Override
   public ResponseEntity<ProjectResponseDto> createProject(ProjectRequestDto projectRequestDto) {
@@ -35,8 +41,8 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
     try {
       List<ProjectResponseDto> response = getAllProjectsLogic();
       return ResponseEntity.ok(response);
-    } catch (ProjectServiceException e) {
-      throw new RuntimeException(e.getMessage());
+    } catch (Exception e) {
+      throw new BadRequestException(e.getMessage());
     }
   }
 
@@ -55,7 +61,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
     try {
       List<ProjectResponseDto> response = getProjectsByClientLogic(clientName);
       return ResponseEntity.ok(response);
-    } catch (ProjectServiceException e) {
+    } catch (Exception e) {
       throw new BadRequestException(e.getMessage());
     }
   }
@@ -65,7 +71,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
     try {
       List<ProjectResponseDto> response = getProjectsByPriorityLogic(priority);
       return ResponseEntity.ok(response);
-    } catch (ProjectServiceException e) {
+    } catch (Exception e) {
       throw new BadRequestException(e.getMessage());
     }
   }
@@ -75,8 +81,8 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
     try {
       List<ProjectResponseDto> response = searchProjectsByTagLogic(tag);
       return ResponseEntity.ok(response);
-    } catch (ProjectServiceException e) {
-      throw new BadRequestException(e.getMessage());
+    } catch (Exception e) {
+      throw new ResourceNotFoundException(e.getMessage());
     }
   }
 
@@ -106,7 +112,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
       ProjectSummaryDto response = getProjectSummaryLogic(projectId);
       return ResponseEntity.ok(response);
     } catch (ProjectServiceException e) {
-      throw new BadRequestException(e.getMessage());
+      throw new ResourceNotFoundException(e.getMessage());
     }
   }
 
@@ -122,9 +128,9 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
     return mapToResponseDto(saved);
   }
 
-  private List<ProjectResponseDto> getAllProjectsLogic() throws ProjectServiceException {
+  private List<ProjectResponseDto> getAllProjectsLogic() {
     List<ProjectEntity> entities = projectRepository.findAll();
-    return entities.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+    return entities.stream().map(this::mapToResponseDto).toList();
   }
 
   private ProjectResponseDto getProjectByIdLogic(String projectId) throws ProjectServiceException {
@@ -135,25 +141,25 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
     return mapToResponseDto(entity.get());
   }
 
-  private List<ProjectResponseDto> getProjectsByClientLogic(String clientName) throws ProjectServiceException {
+  private List<ProjectResponseDto> getProjectsByClientLogic(String clientName) {
     List<ProjectEntity> entities = projectRepository.findAll().stream()
         .filter(p -> clientName.equals(p.getClient()))
-        .collect(Collectors.toList());
-    return entities.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+        .toList();
+    return entities.stream().map(this::mapToResponseDto).toList();
   }
 
-  private List<ProjectResponseDto> getProjectsByPriorityLogic(String priority) throws ProjectServiceException {
+  private List<ProjectResponseDto> getProjectsByPriorityLogic(String priority) {
     List<ProjectEntity> entities = projectRepository.findAll().stream()
         .filter(p -> priority.equals(p.getPriority()))
-        .collect(Collectors.toList());
-    return entities.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+        .toList();
+    return entities.stream().map(this::mapToResponseDto).toList();
   }
 
-  private List<ProjectResponseDto> searchProjectsByTagLogic(String tag) throws ProjectServiceException {
+  private List<ProjectResponseDto> searchProjectsByTagLogic(String tag) {
     List<ProjectEntity> entities = projectRepository.findAll().stream()
         .filter(p -> p.getTags() != null && p.getTags().contains(tag))
-        .collect(Collectors.toList());
-    return entities.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+        .toList();
+    return entities.stream().map(this::mapToResponseDto).toList();
   }
 
   private ProjectResponseDto updateProjectLogic(String projectId, ProjectRequestDto dto)
@@ -164,34 +170,19 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
     }
     ProjectEntity entity = existing.get();
     // Update fields
-    if (dto.getName() != null)
-      entity.setName(dto.getName());
-    if (dto.getClient() != null)
-      entity.setClient(dto.getClient());
-    if (dto.getSummary() != null)
-      entity.setSummary(dto.getSummary());
-    if (dto.getPriority() != null)
-      entity.setPriority(dto.getPriority());
-    if (dto.getHealth() != null)
-      entity.setHealth(dto.getHealth());
-    if (dto.getProgress() != null)
-      entity.setProgress(dto.getProgress());
-    if (dto.getMethodology() != null)
-      entity.setMethodology(dto.getMethodology());
-    if (dto.getCreatedDate() != null)
-      entity.setCreatedDate(dto.getCreatedDate());
-    if (dto.getStartDate() != null)
-      entity.setStartDate(dto.getStartDate());
-    if (dto.getDueDate() != null)
-      entity.setDueDate(dto.getDueDate());
-    if (dto.getTags() != null)
-      entity.setTags(dto.getTags());
-    if (dto.getTasks() != null)
-      entity.setTasks(dto.getTasks());
-    if (dto.getUserCreated() != null)
-      entity.setUserCreated(mapToRoleUserEntity(dto.getUserCreated()));
-    if (dto.getTeamMembers() != null)
-      entity.setTeamMembers(dto.getTeamMembers().stream().map(this::mapToRoleUserEntity).collect(Collectors.toList()));
+    entity.setName(dto.getName());
+    entity.setClient(dto.getClient());
+    entity.setSummary(dto.getSummary());
+    entity.setPriority(dto.getPriority());
+    entity.setHealth(dto.getHealth());
+    entity.setProgress(dto.getProgress());
+    entity.setMethodology(dto.getMethodology());
+    entity.setCreatedDate(dto.getCreatedDate());
+    entity.setStartDate(dto.getStartDate());
+    entity.setDueDate(dto.getDueDate());
+    entity.setTags(dto.getTags());
+    entity.setUserCreated(mapToRoleUserEntity(dto.getUserCreated()));
+    entity.setTeamMembers(dto.getTeamMembers().stream().map(this::mapToRoleUserEntity).toList());
 
     ProjectEntity saved = projectRepository.save(entity);
     return mapToResponseDto(saved);
@@ -237,10 +228,9 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
         .startDate(dto.getStartDate())
         .dueDate(dto.getDueDate())
         .tags(dto.getTags())
-        .tasks(dto.getTasks())
         .userCreated(mapToRoleUserEntity(dto.getUserCreated()))
         .teamMembers(dto.getTeamMembers() != null
-            ? dto.getTeamMembers().stream().map(this::mapToRoleUserEntity).collect(Collectors.toList())
+            ? dto.getTeamMembers().stream().map(this::mapToRoleUserEntity).toList()
             : null)
         .build();
   }
@@ -259,24 +249,23 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
         .startDate(entity.getStartDate())
         .dueDate(entity.getDueDate())
         .tags(entity.getTags())
-        .tasks(entity.getTasks())
         .userCreated(mapToRoleUserDto(entity.getUserCreated()))
         .teamMembers(entity.getTeamMembers() != null
-            ? entity.getTeamMembers().stream().map(this::mapToRoleUserDto).collect(Collectors.toList())
+            ? entity.getTeamMembers().stream().map(this::mapToRoleUserDto).toList()
             : null)
         .build();
   }
 
-  private com.project_service.models.RoleUserEntity mapToRoleUserEntity(RoleUserDto dto) {
+  private RoleUserEntity mapToRoleUserEntity(RoleUserDto dto) {
     if (dto == null)
       return null;
-    return com.project_service.models.RoleUserEntity.builder()
+    return RoleUserEntity.builder()
         .userId(dto.getUserId())
         .role(dto.getRole())
         .build();
   }
 
-  private RoleUserDto mapToRoleUserDto(com.project_service.models.RoleUserEntity entity) {
+  private RoleUserDto mapToRoleUserDto(RoleUserEntity entity) {
     if (entity == null)
       return null;
     return RoleUserDto.builder()

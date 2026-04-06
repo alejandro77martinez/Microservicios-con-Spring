@@ -7,11 +7,11 @@ import lombok.Builder;
 @Builder
 public class ProjectSummaryDto {
 
-    private String id;
-    private String name;
-    private String client;
-    private String priority;
-    private String health;
-    private Number progress;
-    private int teamSize;
+  private String id;
+  private String name;
+  private String client;
+  private String priority;
+  private String health;
+  private Number progress;
+  private int teamSize;
 }

@@ -60,9 +60,6 @@ public class ProjectRequestDto {
   @NotNull(message = "Created tags is required")
   private List<String> tags;
 
-  @NotNull(message = "Created tasks is required")
-  private List<String> tasks;
-
   @NotNull(message = "User created is required")
   private RoleUserDto userCreated;
 

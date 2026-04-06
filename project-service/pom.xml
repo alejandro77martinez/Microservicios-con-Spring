@@ -33,7 +33,7 @@
     <sonar.organization>alejandro77martinez</sonar.organization>
     <!-- ===== SonarQube ===== -->
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    <sonar.projectKey>alejandro77martinez_Microservicios-con-Spring</sonar.projectKey>
+    <sonar.projectKey>alejandro77martinez_microservicio-project-service</sonar.projectKey>
     <sonar.projectName>Microservicio Project Service</sonar.projectName>
     <sonar.java.source>21</sonar.java.source>
      <!-- Apuntar al XML que genera JaCoCo -->

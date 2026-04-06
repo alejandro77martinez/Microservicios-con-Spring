@@ -3,6 +3,9 @@ package com.project_service.controllers;
 import com.project_service.dtos.ApiResponseDto;
 import com.project_service.exceptions.BadRequestException;
 import com.project_service.exceptions.ResourceNotFoundException;
+
+import jakarta.validation.ConstraintViolationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -55,6 +58,17 @@ public class ExceptionController {
     response.put("timestamp", LocalDateTime.now().toString());
 
     return ResponseEntity.badRequest().body(response);
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ApiResponseDto> handleConstraintViolationException(ConstraintViolationException ex) {
+    return ResponseEntity
+      .status(HttpStatus.BAD_REQUEST)
+      .body(ApiResponseDto.builder()
+      .status(400)
+      .message(ex.getMessage())
+      .timestamp(new Date())
+      .build());
   }
 
   // Captura cualquier otra excepción no controlada
