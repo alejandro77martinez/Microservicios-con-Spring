@@ -55,6 +55,26 @@ services:
     networks:
       - app-network
 
+  project-service:
+    build:
+      context: ./project-service
+    container_name: project-service-spring
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/api/v1/project"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    environment:
+      - SERVICE_REGISTRY_HOST=${SERVICE_REGISTRY_HOST}
+      - CONFIG_SERVER_HOST=${CONFIG_SERVER_HOST}
+      - MONGO_DB_URI=${MONGO_DB_URI_PROJECT}
+    depends_on:
+      config-server:
+        condition: service_healthy
+    networks:
+      - app-network
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -68,6 +88,8 @@ services:
       config-server:
         condition: service_healthy
       auth-service:
+        condition: service_healthy
+      project-service:
         condition: service_healthy
     networks:
       - app-network
