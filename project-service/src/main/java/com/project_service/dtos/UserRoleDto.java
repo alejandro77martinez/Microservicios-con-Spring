@@ -5,7 +5,7 @@ import lombok.Builder;
 
 @Data
 @Builder
-public class RoleUserDto {
+public class UserRoleDto {
 
   private String userId;
   private String role;

@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Future;
 import lombok.Data;
 import lombok.Builder;
@@ -36,7 +35,7 @@ public class ProjectRequestDto {
   private String priority;
 
   @NotBlank(message = "Health is required")
-  @Pattern(regexp = "En foco|En riesgo|descubrimiento", message = "Health must be En foco, En riesgo, or descubrimiento")
+  @Pattern(regexp = "En foco|En riesgo|Descubrimiento", message = "Health must be En foco, En riesgo, or descubrimiento")
   private String health;
 
   @NotNull(message = "Progress is required")
@@ -51,7 +50,7 @@ public class ProjectRequestDto {
   @PastOrPresent(message = "Created date must be in the past or present")
   private Date createdDate;
 
-  @FutureOrPresent(message = "Start date must be in the future or present")
+  @NotNull(message = "Start date is required")
   private Date startDate;
 
   @Future(message = "Due date must be in the future")
@@ -61,8 +60,8 @@ public class ProjectRequestDto {
   private List<String> tags;
 
   @NotNull(message = "User created is required")
-  private RoleUserDto userCreated;
+  private UserRoleDto userCreated;
 
   @NotNull(message = "Created team is required")
-  private List<RoleUserDto> teamMembers;
+  private List<UserRoleDto> teamMembers;
 }

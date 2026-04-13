@@ -3,25 +3,22 @@ package com.project_service.dtos;
 import lombok.Data;
 import lombok.Builder;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
 @Builder
-public class ProjectResponseDto {
+public class ProjectResponseCardDto {
 
   private String id;
   private String name;
   private String client;
+  private String role;
   private String summary;
   private String priority;
   private String health;
-  private Number progress;
+  private Integer progress;
+  private String dueDate;
   private String methodology;
-  private Date createdDate;
-  private Date startDate;
-  private Date dueDate;
+  private List<String> teamMembers;
   private List<String> tags;
-  private UserRoleDto userCreated;
-  private List<UserRoleDto> teamMembers;
 }

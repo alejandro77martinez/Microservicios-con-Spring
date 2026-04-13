@@ -3,16 +3,12 @@ package com.auth_service.dtos;
 import lombok.Data;
 import lombok.Builder;
 
-import java.util.List;
-
 @Data
 @Builder
-public class UserResponse {
-    
+public class UserEmailResponse {
+  
   private String id;
-  private String name;
-  private String lastName;
   private String email;
+  private String name;
   private String avatar;
-  private List<String> roles;
 }

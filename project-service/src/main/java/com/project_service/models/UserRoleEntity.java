@@ -11,7 +11,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleUserEntity {
+public class UserRoleEntity {
 
   private String userId;
   private String role;

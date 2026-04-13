@@ -4,11 +4,11 @@ import com.project_service.dtos.ApiResponseDto;
 import com.project_service.dtos.ProjectRequestDto;
 import com.project_service.dtos.ProjectResponseDto;
 import com.project_service.dtos.ProjectSummaryDto;
-import com.project_service.dtos.RoleUserDto;
+import com.project_service.dtos.UserRoleDto;
 import com.project_service.exceptions.BadRequestException;
 import com.project_service.exceptions.ResourceNotFoundException;
 import com.project_service.models.ProjectEntity;
-import com.project_service.models.RoleUserEntity;
+import com.project_service.models.UserRoleEntity;
 import com.project_service.repositories.ProjectRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -203,10 +203,10 @@ class ProjectCrudServiceImplTest {
         .startDate(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24))
         .dueDate(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 10))
         .tags(List.of("tag1", "tag2"))
-        .userCreated(RoleUserDto.builder().userId("user-1").role("ADMIN").build())
+        .userCreated(UserRoleDto.builder().userId("user-1").role("ADMIN").build())
         .teamMembers(List.of(
-            RoleUserDto.builder().userId("user-2").role("DEV").build(),
-            RoleUserDto.builder().userId("user-3").role("QA").build()
+            UserRoleDto.builder().userId("user-2").role("DEV").build(),
+            UserRoleDto.builder().userId("user-3").role("QA").build()
         ))
         .build();
   }
@@ -225,10 +225,10 @@ class ProjectCrudServiceImplTest {
         .startDate(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24))
         .dueDate(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 10))
         .tags(List.of("tag1", "tag2"))
-        .userCreated(RoleUserEntity.builder().userId("user-1").role("ADMIN").build())
+        .userCreated(UserRoleEntity.builder().userId("user-1").role("ADMIN").build())
         .teamMembers(List.of(
-            RoleUserEntity.builder().userId("user-2").role("DEV").build(),
-            RoleUserEntity.builder().userId("user-3").role("QA").build()
+            UserRoleEntity.builder().userId("user-2").role("DEV").build(),
+            UserRoleEntity.builder().userId("user-3").role("QA").build()
         ))
         .build();
   }

@@ -5,15 +5,17 @@ import com.project_service.exceptions.BadRequestException;
 import com.project_service.exceptions.ProjectServiceException;
 import com.project_service.exceptions.ResourceNotFoundException;
 import com.project_service.models.ProjectEntity;
-import com.project_service.models.RoleUserEntity;
+import com.project_service.models.UserRoleEntity;
 import com.project_service.repositories.ProjectRepository;
 import com.project_service.services.interfaces.ProjectCrudService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 @Service
 public class ProjectCrudServiceImpl implements ProjectCrudService {
@@ -77,6 +79,16 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   }
 
   @Override
+  public ResponseEntity<List<ProjectResponseCardDto>> getProjectsByUser(String userId) {
+    try {
+      List<ProjectResponseCardDto> response = getProjectsByUserLogic(userId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      throw new ResourceNotFoundException(e.getMessage());
+    }
+  }
+
+  @Override
   public ResponseEntity<List<ProjectResponseDto>> searchProjectsByTag(String tag) {
     try {
       List<ProjectResponseDto> response = searchProjectsByTagLogic(tag);
@@ -116,7 +128,70 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
     }
   }
 
+  @Override
+  public ResponseEntity<ProjectResponseDto> updateProgressProject(String projectId, Integer progress) {
+    try {
+      ProjectResponseDto response = updateProgressProjectLogic(projectId, progress);
+      return ResponseEntity.ok(response);
+    } catch (ProjectServiceException e) {
+      throw new BadRequestException(e.getMessage());
+    }
+  }
+
+  @Override
+  public ResponseEntity<ProjectResponseDto> updateHealthProject(String projectId, String health) {
+    try {
+      ProjectResponseDto response = updateHealthProjectLogic(projectId, health);
+      return ResponseEntity.ok(response);
+    } catch (ProjectServiceException e) {
+      throw new BadRequestException(e.getMessage());
+    }
+  }
+
+  @Override
+  public ResponseEntity<ProjectResponseDto> updatePriorityProject(String projectId, String priority) {
+    try {
+      ProjectResponseDto response = updatePriorityProjectLogic(projectId, priority);
+      return ResponseEntity.ok(response);
+    } catch (ProjectServiceException e) {
+      throw new BadRequestException(e.getMessage());
+    }
+  }
+
   // Métodos privados con lógica
+
+  private ProjectResponseDto updatePriorityProjectLogic(String projectId, String priority) throws ProjectServiceException {
+    Optional<ProjectEntity> existing = projectRepository.findById(projectId);
+    if (!existing.isPresent()) {
+      throw new ProjectServiceException("Project not found with id: " + projectId);
+    }
+    ProjectEntity entity = existing.get();
+    entity.setPriority(priority);
+    ProjectEntity saved = projectRepository.save(entity);
+    return mapToResponseDto(saved);
+  }
+
+  private ProjectResponseDto updateHealthProjectLogic(String projectId, String health) throws ProjectServiceException {
+    Optional<ProjectEntity> existing = projectRepository.findById(projectId);
+    if (!existing.isPresent()) {
+      throw new ProjectServiceException("Project not found with id: " + projectId);
+    }
+    ProjectEntity entity = existing.get();
+    entity.setHealth(health);
+    ProjectEntity saved = projectRepository.save(entity);
+    return mapToResponseDto(saved);
+  }
+
+  private ProjectResponseDto updateProgressProjectLogic(String projectId, Integer progress) throws ProjectServiceException {
+    Optional<ProjectEntity> existing = projectRepository.findById(projectId);
+    if (!existing.isPresent()) {
+      throw new ProjectServiceException("Project not found with id: " + projectId);
+    }
+    ProjectEntity entity = existing.get();
+    entity.setProgress(progress);
+    ProjectEntity saved = projectRepository.save(entity);
+    return mapToResponseDto(saved);
+  }
 
   private ProjectResponseDto createProjectLogic(ProjectRequestDto dto) throws ProjectServiceException {
     Optional<ProjectEntity> existing = projectRepository.findByName(dto.getName());
@@ -181,8 +256,8 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
     entity.setStartDate(dto.getStartDate());
     entity.setDueDate(dto.getDueDate());
     entity.setTags(dto.getTags());
-    entity.setUserCreated(mapToRoleUserEntity(dto.getUserCreated()));
-    entity.setTeamMembers(dto.getTeamMembers().stream().map(this::mapToRoleUserEntity).toList());
+    entity.setUserCreated(mapToUserRoleEntity(dto.getUserCreated()));
+    entity.setTeamMembers(dto.getTeamMembers().stream().map(this::mapToUserRoleEntity).toList());
 
     ProjectEntity saved = projectRepository.save(entity);
     return mapToResponseDto(saved);
@@ -228,9 +303,9 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
         .startDate(dto.getStartDate())
         .dueDate(dto.getDueDate())
         .tags(dto.getTags())
-        .userCreated(mapToRoleUserEntity(dto.getUserCreated()))
+        .userCreated(mapToUserRoleEntity(dto.getUserCreated()))
         .teamMembers(dto.getTeamMembers() != null
-            ? dto.getTeamMembers().stream().map(this::mapToRoleUserEntity).toList()
+            ? dto.getTeamMembers().stream().map(this::mapToUserRoleEntity).toList()
             : null)
         .build();
   }
@@ -249,28 +324,76 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
         .startDate(entity.getStartDate())
         .dueDate(entity.getDueDate())
         .tags(entity.getTags())
-        .userCreated(mapToRoleUserDto(entity.getUserCreated()))
+        .userCreated(mapToUserRoleDto(entity.getUserCreated()))
         .teamMembers(entity.getTeamMembers() != null
-            ? entity.getTeamMembers().stream().map(this::mapToRoleUserDto).toList()
+            ? entity.getTeamMembers().stream().map(this::mapToUserRoleDto).toList()
             : null)
         .build();
   }
 
-  private RoleUserEntity mapToRoleUserEntity(RoleUserDto dto) {
+  private List<ProjectResponseCardDto> getProjectsByUserLogic(String userId) {
+    List<ProjectEntity> entities = projectRepository.findByUserCreatedUserIdOrTeamMembersUserId(userId, userId);
+    return entities.stream().map(entity -> mapToResponseCardDto(entity, userId)).toList();
+  }
+
+  private ProjectResponseCardDto mapToResponseCardDto(ProjectEntity entity, String userId) {
+    return ProjectResponseCardDto.builder()
+        .id(entity.getId())
+        .name(entity.getName())
+        .client(entity.getClient())
+        .role(findRoleForUser(entity, userId))
+        .summary(entity.getSummary())
+        .priority(entity.getPriority())
+        .health(entity.getHealth())
+        .progress(entity.getProgress() != null ? entity.getProgress().intValue() : null)
+        .dueDate(formatDate(entity.getDueDate()))
+        .methodology(entity.getMethodology())
+        .teamMembers(entity.getTeamMembers() != null
+            ? entity.getTeamMembers().stream().map(UserRoleEntity::getUserId).toList()
+            : null)
+        .tags(entity.getTags())
+        .build();
+  }
+
+  private String findRoleForUser(ProjectEntity entity, String userId) {
+    if (entity.getUserCreated() != null && userId.equals(entity.getUserCreated().getUserId())) {
+      return entity.getUserCreated().getRole();
+    }
+    if (entity.getTeamMembers() != null) {
+      return entity.getTeamMembers().stream()
+          .filter(member -> userId.equals(member.getUserId()))
+          .findFirst()
+          .map(UserRoleEntity::getRole)
+          .orElse(null);
+    }
+    return null;
+  }
+
+  private String formatDate(java.util.Date date) {
+    if (date == null) {
+      return null;
+    }
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    return formatter.format(date);
+  }
+
+  private UserRoleEntity mapToUserRoleEntity(UserRoleDto dto) {
     if (dto == null)
       return null;
-    return RoleUserEntity.builder()
+    return UserRoleEntity.builder()
         .userId(dto.getUserId())
         .role(dto.getRole())
         .build();
   }
 
-  private RoleUserDto mapToRoleUserDto(RoleUserEntity entity) {
+  private UserRoleDto mapToUserRoleDto(UserRoleEntity entity) {
     if (entity == null)
       return null;
-    return RoleUserDto.builder()
+    return UserRoleDto.builder()
         .userId(entity.getUserId())
         .role(entity.getRole())
         .build();
   }
+
 }

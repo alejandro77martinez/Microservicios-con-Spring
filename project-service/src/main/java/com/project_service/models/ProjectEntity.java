@@ -47,7 +47,7 @@ public class ProjectEntity {
 
   private List<String> tags;
 
-  private RoleUserEntity userCreated;
+  private UserRoleEntity userCreated;
 
-  private List<RoleUserEntity> teamMembers;
+  private List<UserRoleEntity> teamMembers;
 }
