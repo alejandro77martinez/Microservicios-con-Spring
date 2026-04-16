@@ -17,4 +17,5 @@ public interface UserService {
   ResponseEntity<String> deleteById(String id); 
   ResponseEntity<Boolean> existUserName(String name);
   ResponseEntity<List<UserEmailResponse>> searchUsersByEmail(String email);
+  ResponseEntity<List<UserEmailResponse>> searchUsersByTeamIds(List<String> teamIds);
 }

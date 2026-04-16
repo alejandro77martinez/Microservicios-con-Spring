@@ -162,4 +162,24 @@ class UserServiceImpl implements UserService {
       .roles(user.getRoles())
       .build();
   }
+
+  @Override
+  public ResponseEntity<List<UserEmailResponse>> searchUsersByTeamIds(List<String> teamIds) {
+    try {
+      return ResponseEntity.ok(searchUsersByTeamIdsLogic(teamIds));
+    } catch (UserServiceException e) {
+      throw new ResourceNotFoundException(e.getMessage());
+    }
+  }
+
+  private List<UserEmailResponse> searchUsersByTeamIdsLogic(List<String> teamIds) throws UserServiceException {
+    if (teamIds == null || teamIds.isEmpty()) {
+      throw new BadRequestException("Team IDs cannot be null or empty");
+    }
+    List<UserEntity> users = userRepository.findAllById(teamIds);
+    if (users.isEmpty()) {
+      throw new UserServiceException("No users found with team IDs: " + teamIds);
+    }
+    return mapToUserEmailResponseList(users);
+  }
 }

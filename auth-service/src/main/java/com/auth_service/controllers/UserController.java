@@ -54,4 +54,9 @@ public class UserController {
   public ResponseEntity<List<UserEmailResponse>> searchUsersByEmail(@PathVariable String email) {
     return userService.searchUsersByEmail(email);
   }
+
+  @PostMapping("/search/team")
+  public ResponseEntity<List<UserEmailResponse>> searchUsersByTeam(@RequestBody  List<String> teamIds) {
+    return userService.searchUsersByTeamIds(teamIds);
+  }
 }
