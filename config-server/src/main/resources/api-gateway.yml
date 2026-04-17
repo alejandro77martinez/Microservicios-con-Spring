@@ -30,8 +30,25 @@ spring:
           routes:
             - id: auth-service
               uri: lb://auth-service
+              order: 1
               predicates:
-                - Path=/api/v1/**
+                - Path=/api/v1/auth/**
+              filters:
+                - name: JwtAuthFilter
+
+            - id: auth-service
+              uri: lb://auth-service
+              order: 2
+              predicates:
+                - Path=/api/v1/user/**
+              filters:
+                - name: JwtAuthFilter
+
+            - id: project-service
+              uri: lb://project-service
+              order: 3
+              predicates:
+                - Path=/api/v1/project/**
               filters:
                 - name: JwtAuthFilter
 

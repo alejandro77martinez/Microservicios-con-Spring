@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.auth_service.dtos.RegisterRequest;
+import com.auth_service.dtos.UserEmailResponse;
 import com.auth_service.dtos.UserResponse;
 import com.auth_service.services.interfaces.UserService;
 
@@ -47,5 +48,15 @@ public class UserController {
   @PostMapping("/exist")
   public ResponseEntity<Boolean> existUserName(@RequestBody String userName){
     return userService.existUserName(userName);
+  }
+
+  @GetMapping("/search/email/{email}")
+  public ResponseEntity<List<UserEmailResponse>> searchUsersByEmail(@PathVariable String email) {
+    return userService.searchUsersByEmail(email);
+  }
+
+  @PostMapping("/search/team")
+  public ResponseEntity<List<UserEmailResponse>> searchUsersByTeam(@RequestBody  List<String> teamIds) {
+    return userService.searchUsersByTeamIds(teamIds);
   }
 }
