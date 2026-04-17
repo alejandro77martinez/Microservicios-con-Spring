@@ -32,5 +32,7 @@ public class UserEntity {
 
   private String password;
 
+  private String avatar;
+
   private List<String> roles;
 }

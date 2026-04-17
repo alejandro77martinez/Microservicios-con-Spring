@@ -140,9 +140,11 @@ public class AuthServiceImpl implements AuthService {
       throw new AuthServiceException("User not found with email: " + email);
     }
     return UserResponse.builder()
+      .id(user.get().getId())
       .name(user.get().getName())
       .lastName(user.get().getLastName())
       .email(user.get().getEmail())
+      .avatar(user.get().getAvatar() != null && !user.get().getAvatar().isBlank() ? user.get().getAvatar() : "/user.png")
       .roles(user.get().getRoles())
       .build();
   }
