@@ -18,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "tasks")
-public class taskEntity {
+public class TaskEntity {
 
   @Id
   private String id;

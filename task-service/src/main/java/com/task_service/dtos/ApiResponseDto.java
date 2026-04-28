@@ -1,18 +1,12 @@
 package com.task_service.dtos;
 
-import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.Date;
 
-@Getter
-@Setter
+@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class ApiResponseDto {
   private Integer status;
   private String message;

@@ -1,6 +1,6 @@
 package com.task_service.repositories;
 
-import com.task_service.models.taskEntity;
+import com.task_service.models.TaskEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,22 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TaskRepository extends MongoRepository<taskEntity, String> {
-  Optional<taskEntity> findByTitle(String title);
-  
-  List<taskEntity> findByStatus(String status);
-  
-  List<taskEntity> findByPriority(String priority);
-  
-  List<taskEntity> findByProjectId(String projectId);
-  
-  List<taskEntity> findByAssigneeId(String assigneeId);
-  
-  List<taskEntity> findByType(String type);
-  
-  List<taskEntity> findByBlocked(Boolean blocked);
-  
-  List<taskEntity> findByProjectIdAndStatus(String projectId, String status);
-  
-  List<taskEntity> findByProjectIdAndPriority(String projectId, String priority);
+public interface TaskRepository extends MongoRepository<TaskEntity, String> {
+
+  Optional<TaskEntity> findByTitle(String title); 
+  List<TaskEntity> findByStatus(String status);
+  List<TaskEntity> findByPriority(String priority);
+  List<TaskEntity> findByProjectId(String projectId);
+  List<TaskEntity> findByAssigneeId(String assigneeId);
+  List<TaskEntity> findByType(String type);
+  List<TaskEntity> findByBlocked(Boolean blocked);
+  List<TaskEntity> findByProjectIdAndStatus(String projectId, String status);
+  List<TaskEntity> findByProjectIdAndPriority(String projectId, String priority);
 }

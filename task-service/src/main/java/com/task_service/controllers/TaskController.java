@@ -21,10 +21,12 @@ import java.util.List;
 @RequestMapping("/task")
 public class TaskController {
 
-  @Autowired
-  private TaskCrudService taskCrudService;
+  private final TaskCrudService taskCrudService;
 
-  // CRUD Operations
+  @Autowired
+  public TaskController(TaskCrudService taskCrudService) {
+    this.taskCrudService = taskCrudService;
+  }
 
   @PostMapping
   public ResponseEntity<TaskResponseDto> createTask(@Valid @RequestBody TaskRequestDto dto) {
@@ -55,13 +57,11 @@ public class TaskController {
     return taskCrudService.deleteTask(taskId);
   }
 
-  // Queries by criteria
-
   @GetMapping("/status/{status}")
   public ResponseEntity<List<TaskResponseDto>> getTasksByStatus(
       @PathVariable @NotBlank(message = "Status cannot be blank")
-      @Pattern(regexp = "Pending|In Progress|Completed|Blocked", 
-        message = "Status must be one of: Pending, In Progress, Completed, Blocked") String status) {
+      @Pattern(regexp = "Created|Pending|In Progress|Completed|Blocked", 
+        message = "Status must be one of: Created, Pending, In Progress, Completed, Blocked") String status) {
     return taskCrudService.getTasksByStatus(status);
   }
 
@@ -102,8 +102,6 @@ public class TaskController {
     return taskCrudService.getTasksByProjectIdAndStatus(projectId, status);
   }
 
-  // Partial updates
-
   @PutMapping("/{taskId}/status/{status}")
   public ResponseEntity<TaskResponseDto> updateTaskStatus(
       @PathVariable @NotBlank(message = "Task ID cannot be blank") String taskId,
@@ -136,8 +134,6 @@ public class TaskController {
       @PathVariable Boolean blocked) {
     return taskCrudService.updateTaskBlocked(taskId, blocked);
   }
-
-  // Summary view
 
   @GetMapping("/{taskId}/summary")
   public ResponseEntity<TaskSummaryDto> getTaskSummary(

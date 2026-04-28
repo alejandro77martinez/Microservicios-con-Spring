@@ -1,19 +1,13 @@
 package com.task_service.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.Date;
 import java.util.List;
 
-@Getter
-@Setter
+import lombok.Data;
+import lombok.Builder;
+
+@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class TaskResponseDto {
   private String id;
   private String title;
@@ -23,9 +17,9 @@ public class TaskResponseDto {
   private String projectId;
   private String assigneeId;
   private List<String> subTasks;
-  private String dueDate;
-  private String createdDate;
-  private String startDate;
+  private Date dueDate;
+  private Date createdDate;
+  private Date startDate;
   private String priority;
   private Integer effortPoints;
   private Boolean blocked;

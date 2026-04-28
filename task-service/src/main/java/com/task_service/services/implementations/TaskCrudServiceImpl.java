@@ -8,7 +8,7 @@ import com.task_service.dtos.ApiResponseDto;
 import com.task_service.exceptions.BadRequestException;
 import com.task_service.exceptions.ResourceNotFoundException;
 import com.task_service.exceptions.TaskServiceException;
-import com.task_service.models.taskEntity;
+import com.task_service.models.TaskEntity;
 import com.task_service.repositories.TaskRepository;
 import com.task_service.services.interfaces.TaskCrudService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,24 +16,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskCrudServiceImpl implements TaskCrudService {
 
+  private final TaskRepository taskRepository;
+  private final static String TASK_NOT_FOUND_MESSAGE = "Task not found with id: ";
+
   @Autowired
-  private TaskRepository taskRepository;
+  public TaskCrudServiceImpl(TaskRepository taskRepository) {
+    this.taskRepository = taskRepository;
+  }
 
   // CRUD Operations
 
   @Override
   public ResponseEntity<TaskResponseDto> createTask(TaskRequestDto dto) {
     try {
-      return new ResponseEntity<>(createTaskLogic(dto), HttpStatus.CREATED);
+      return ResponseEntity.status(HttpStatus.CREATED).body(createTaskLogic(dto));
     } catch (TaskServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -42,7 +44,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<List<TaskResponseDto>> getAllTasks() {
     try {
-      return new ResponseEntity<>(getAllTasksLogic(), HttpStatus.OK);
+      return ResponseEntity.ok(getAllTasksLogic());
     } catch (TaskServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -51,7 +53,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<TaskResponseDto> getTaskById(String id) {
     try {
-      return new ResponseEntity<>(getTaskByIdLogic(id), HttpStatus.OK);
+      return ResponseEntity.ok(getTaskByIdLogic(id));
     } catch (TaskServiceException e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -60,7 +62,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<TaskResponseDto> updateTask(String id, TaskRequestDto dto) {
     try {
-      return new ResponseEntity<>(updateTaskLogic(id, dto), HttpStatus.OK);
+      return ResponseEntity.ok(updateTaskLogic(id, dto));
     } catch (TaskServiceException e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -69,13 +71,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<ApiResponseDto> deleteTask(String id) {
     try {
-      deleteTaskLogic(id);
-      ApiResponseDto response = ApiResponseDto.builder()
-          .status(HttpStatus.OK.value())
-          .message("Task deleted successfully")
-          .timestamp(new Date())
-          .build();
-      return new ResponseEntity<>(response, HttpStatus.OK);
+      return ResponseEntity.ok(deleteTaskLogic(id));
     } catch (TaskServiceException e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -86,7 +82,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<List<TaskResponseDto>> getTasksByStatus(String status) {
     try {
-      return new ResponseEntity<>(getTasksByStatusLogic(status), HttpStatus.OK);
+      return ResponseEntity.ok(getTasksByStatusLogic(status));
     } catch (TaskServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -95,7 +91,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<List<TaskResponseDto>> getTasksByPriority(String priority) {
     try {
-      return new ResponseEntity<>(getTasksByPriorityLogic(priority), HttpStatus.OK);
+      return ResponseEntity.ok(getTasksByPriorityLogic(priority));
     } catch (TaskServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -104,7 +100,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<List<TaskResponseDto>> getTasksByType(String type) {
     try {
-      return new ResponseEntity<>(getTasksByTypeLogic(type), HttpStatus.OK);
+      return ResponseEntity.ok(getTasksByTypeLogic(type));
     } catch (TaskServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -113,7 +109,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<List<TaskResponseDto>> getTasksByProjectId(String projectId) {
     try {
-      return new ResponseEntity<>(getTasksByProjectIdLogic(projectId), HttpStatus.OK);
+      return ResponseEntity.ok(getTasksByProjectIdLogic(projectId));
     } catch (TaskServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -122,7 +118,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<List<TaskResponseDto>> getTasksByAssigneeId(String assigneeId) {
     try {
-      return new ResponseEntity<>(getTasksByAssigneeIdLogic(assigneeId), HttpStatus.OK);
+      return ResponseEntity.ok(getTasksByAssigneeIdLogic(assigneeId));
     } catch (TaskServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -131,7 +127,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<List<TaskResponseCardDto>> getTasksByProjectIdAndStatus(String projectId, String status) {
     try {
-      return new ResponseEntity<>(getTasksByProjectIdAndStatusLogic(projectId, status), HttpStatus.OK);
+      return ResponseEntity.ok(getTasksByProjectIdAndStatusLogic(projectId, status));
     } catch (TaskServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -142,7 +138,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<TaskResponseDto> updateTaskStatus(String id, String status) {
     try {
-      return new ResponseEntity<>(updateTaskStatusLogic(id, status), HttpStatus.OK);
+      return ResponseEntity.ok(updateTaskStatusLogic(id, status));
     } catch (TaskServiceException e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -151,7 +147,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<TaskResponseDto> updateTaskPriority(String id, String priority) {
     try {
-      return new ResponseEntity<>(updateTaskPriorityLogic(id, priority), HttpStatus.OK);
+      return ResponseEntity.ok(updateTaskPriorityLogic(id, priority));
     } catch (TaskServiceException e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -160,8 +156,11 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<TaskResponseDto> updateTaskEffortPoints(String id, Integer effortPoints) {
     try {
-      return new ResponseEntity<>(updateTaskEffortPointsLogic(id, effortPoints), HttpStatus.OK);
+      return ResponseEntity.ok(updateTaskEffortPointsLogic(id, effortPoints));
     } catch (TaskServiceException e) {
+      if (e.getMessage().contains("Effort points must be between")) {
+        throw new BadRequestException(e.getMessage());
+      }
       throw new ResourceNotFoundException(e.getMessage());
     }
   }
@@ -169,7 +168,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<TaskResponseDto> updateTaskBlocked(String id, Boolean blocked) {
     try {
-      return new ResponseEntity<>(updateTaskBlockedLogic(id, blocked), HttpStatus.OK);
+      return ResponseEntity.ok(updateTaskBlockedLogic(id, blocked));
     } catch (TaskServiceException e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -178,7 +177,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   @Override
   public ResponseEntity<TaskSummaryDto> getTaskSummary(String id) {
     try {
-      return new ResponseEntity<>(getTaskSummaryLogic(id), HttpStatus.OK);
+      return ResponseEntity.ok(getTaskSummaryLogic(id));
     } catch (TaskServiceException e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -196,11 +195,9 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         throw new TaskServiceException("Project ID is required");
       }
 
-      taskEntity entity = mapToEntity(dto);
-      taskEntity savedEntity = taskRepository.save(entity);
+      TaskEntity entity = mapToEntity(dto);
+      TaskEntity savedEntity = taskRepository.save(entity);
       return mapToResponseDto(savedEntity);
-    } catch (TaskServiceException e) {
-      throw e;
     } catch (Exception e) {
       throw new TaskServiceException("Error creating task: " + e.getMessage());
     }
@@ -208,8 +205,8 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private List<TaskResponseDto> getAllTasksLogic() throws TaskServiceException {
     try {
-      List<taskEntity> tasks = taskRepository.findAll();
-      return tasks.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+      List<TaskEntity> tasks = taskRepository.findAll();
+      return tasks.stream().map(this::mapToResponseDto).toList();
     } catch (Exception e) {
       throw new TaskServiceException("Error retrieving tasks: " + e.getMessage());
     }
@@ -217,11 +214,9 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private TaskResponseDto getTaskByIdLogic(String id) throws TaskServiceException {
     try {
-      taskEntity entity = taskRepository.findById(id)
-          .orElseThrow(() -> new TaskServiceException("Task not found with id: " + id));
+      TaskEntity entity = taskRepository.findById(id)
+          .orElseThrow(() -> new TaskServiceException(TASK_NOT_FOUND_MESSAGE + id));
       return mapToResponseDto(entity);
-    } catch (TaskServiceException e) {
-      throw e;
     } catch (Exception e) {
       throw new TaskServiceException("Error retrieving task: " + e.getMessage());
     }
@@ -229,8 +224,8 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private TaskResponseDto updateTaskLogic(String id, TaskRequestDto dto) throws TaskServiceException {
     try {
-      taskEntity entity = taskRepository.findById(id)
-          .orElseThrow(() -> new TaskServiceException("Task not found with id: " + id));
+      TaskEntity entity = taskRepository.findById(id)
+          .orElseThrow(() -> new TaskServiceException(TASK_NOT_FOUND_MESSAGE + id));
 
       entity.setTitle(dto.getTitle());
       entity.setDescription(dto.getDescription());
@@ -239,13 +234,13 @@ public class TaskCrudServiceImpl implements TaskCrudService {
       entity.setProjectId(dto.getProjectId());
       entity.setAssigneeId(dto.getAssigneeId());
       entity.setSubTasks(dto.getSubTasks());
-      entity.setDueDate(new java.sql.Date(dto.getDueDate().getTime()));
-      entity.setStartDate(dto.getStartDate() != null ? new java.sql.Date(dto.getStartDate().getTime()) : null);
+      entity.setDueDate(new Date(dto.getDueDate().getTime()));
+      entity.setStartDate(dto.getStartDate() != null ? new Date(dto.getStartDate().getTime()) : null);
       entity.setPriority(dto.getPriority());
       entity.setEffortPoints(dto.getEffortPoints());
-      entity.setBlocked(dto.getBlocked() != null ? dto.getBlocked() : false);
+      entity.setBlocked(dto.getBlocked());
 
-      taskEntity updatedEntity = taskRepository.save(entity);
+      TaskEntity updatedEntity = taskRepository.save(entity);
       return mapToResponseDto(updatedEntity);
     } catch (TaskServiceException e) {
       throw e;
@@ -254,13 +249,16 @@ public class TaskCrudServiceImpl implements TaskCrudService {
     }
   }
 
-  private void deleteTaskLogic(String id) throws TaskServiceException {
+  private ApiResponseDto deleteTaskLogic(String id) throws TaskServiceException {
     try {
-      taskEntity entity = taskRepository.findById(id)
-          .orElseThrow(() -> new TaskServiceException("Task not found with id: " + id));
+      taskRepository.findById(id)
+        .orElseThrow(() -> new TaskServiceException(TASK_NOT_FOUND_MESSAGE + id));
       taskRepository.deleteById(id);
-    } catch (TaskServiceException e) {
-      throw e;
+      return ApiResponseDto.builder()
+          .status(HttpStatus.OK.value())
+          .message("Task deleted successfully")
+          .timestamp(new Date())
+          .build();
     } catch (Exception e) {
       throw new TaskServiceException("Error deleting task: " + e.getMessage());
     }
@@ -268,8 +266,8 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private List<TaskResponseDto> getTasksByStatusLogic(String status) throws TaskServiceException {
     try {
-      List<taskEntity> tasks = taskRepository.findByStatus(status);
-      return tasks.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+      List<TaskEntity> tasks = taskRepository.findByStatus(status);
+      return tasks.stream().map(this::mapToResponseDto).toList();
     } catch (Exception e) {
       throw new TaskServiceException("Error retrieving tasks by status: " + e.getMessage());
     }
@@ -277,8 +275,8 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private List<TaskResponseDto> getTasksByPriorityLogic(String priority) throws TaskServiceException {
     try {
-      List<taskEntity> tasks = taskRepository.findByPriority(priority);
-      return tasks.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+      List<TaskEntity> tasks = taskRepository.findByPriority(priority);
+      return tasks.stream().map(this::mapToResponseDto).toList();
     } catch (Exception e) {
       throw new TaskServiceException("Error retrieving tasks by priority: " + e.getMessage());
     }
@@ -286,8 +284,8 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private List<TaskResponseDto> getTasksByTypeLogic(String type) throws TaskServiceException {
     try {
-      List<taskEntity> tasks = taskRepository.findByType(type);
-      return tasks.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+      List<TaskEntity> tasks = taskRepository.findByType(type);
+      return tasks.stream().map(this::mapToResponseDto).toList();
     } catch (Exception e) {
       throw new TaskServiceException("Error retrieving tasks by type: " + e.getMessage());
     }
@@ -295,8 +293,8 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private List<TaskResponseDto> getTasksByProjectIdLogic(String projectId) throws TaskServiceException {
     try {
-      List<taskEntity> tasks = taskRepository.findByProjectId(projectId);
-      return tasks.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+      List<TaskEntity> tasks = taskRepository.findByProjectId(projectId);
+      return tasks.stream().map(this::mapToResponseDto).toList();
     } catch (Exception e) {
       throw new TaskServiceException("Error retrieving tasks by project: " + e.getMessage());
     }
@@ -304,8 +302,8 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private List<TaskResponseDto> getTasksByAssigneeIdLogic(String assigneeId) throws TaskServiceException {
     try {
-      List<taskEntity> tasks = taskRepository.findByAssigneeId(assigneeId);
-      return tasks.stream().map(this::mapToResponseDto).collect(Collectors.toList());
+      List<TaskEntity> tasks = taskRepository.findByAssigneeId(assigneeId);
+      return tasks.stream().map(this::mapToResponseDto).toList();
     } catch (Exception e) {
       throw new TaskServiceException("Error retrieving tasks by assignee: " + e.getMessage());
     }
@@ -313,8 +311,8 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private List<TaskResponseCardDto> getTasksByProjectIdAndStatusLogic(String projectId, String status) throws TaskServiceException {
     try {
-      List<taskEntity> tasks = taskRepository.findByProjectIdAndStatus(projectId, status);
-      return tasks.stream().map(this::mapToResponseCardDto).collect(Collectors.toList());
+      List<TaskEntity> tasks = taskRepository.findByProjectIdAndStatus(projectId, status);
+      return tasks.stream().map(this::mapToResponseCardDto).toList();
     } catch (Exception e) {
       throw new TaskServiceException("Error retrieving tasks by project and status: " + e.getMessage());
     }
@@ -322,13 +320,11 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private TaskResponseDto updateTaskStatusLogic(String id, String status) throws TaskServiceException {
     try {
-      taskEntity entity = taskRepository.findById(id)
-          .orElseThrow(() -> new TaskServiceException("Task not found with id: " + id));
+      TaskEntity entity = taskRepository.findById(id)
+          .orElseThrow(() -> new TaskServiceException(TASK_NOT_FOUND_MESSAGE + id));
       entity.setStatus(status);
-      taskEntity updatedEntity = taskRepository.save(entity);
+      TaskEntity updatedEntity = taskRepository.save(entity);
       return mapToResponseDto(updatedEntity);
-    } catch (TaskServiceException e) {
-      throw e;
     } catch (Exception e) {
       throw new TaskServiceException("Error updating task status: " + e.getMessage());
     }
@@ -336,13 +332,11 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private TaskResponseDto updateTaskPriorityLogic(String id, String priority) throws TaskServiceException {
     try {
-      taskEntity entity = taskRepository.findById(id)
-          .orElseThrow(() -> new TaskServiceException("Task not found with id: " + id));
+      TaskEntity entity = taskRepository.findById(id)
+          .orElseThrow(() -> new TaskServiceException(TASK_NOT_FOUND_MESSAGE + id));
       entity.setPriority(priority);
-      taskEntity updatedEntity = taskRepository.save(entity);
+      TaskEntity updatedEntity = taskRepository.save(entity);
       return mapToResponseDto(updatedEntity);
-    } catch (TaskServiceException e) {
-      throw e;
     } catch (Exception e) {
       throw new TaskServiceException("Error updating task priority: " + e.getMessage());
     }
@@ -353,13 +347,11 @@ public class TaskCrudServiceImpl implements TaskCrudService {
       if (effortPoints < 0 || effortPoints > 100) {
         throw new TaskServiceException("Effort points must be between 0 and 100");
       }
-      taskEntity entity = taskRepository.findById(id)
-          .orElseThrow(() -> new TaskServiceException("Task not found with id: " + id));
+      TaskEntity entity = taskRepository.findById(id)
+          .orElseThrow(() -> new TaskServiceException(TASK_NOT_FOUND_MESSAGE + id));
       entity.setEffortPoints(effortPoints);
-      taskEntity updatedEntity = taskRepository.save(entity);
+      TaskEntity updatedEntity = taskRepository.save(entity);
       return mapToResponseDto(updatedEntity);
-    } catch (TaskServiceException e) {
-      throw e;
     } catch (Exception e) {
       throw new TaskServiceException("Error updating task effort points: " + e.getMessage());
     }
@@ -367,13 +359,11 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private TaskResponseDto updateTaskBlockedLogic(String id, Boolean blocked) throws TaskServiceException {
     try {
-      taskEntity entity = taskRepository.findById(id)
-          .orElseThrow(() -> new TaskServiceException("Task not found with id: " + id));
-      entity.setBlocked(blocked != null ? blocked : false);
-      taskEntity updatedEntity = taskRepository.save(entity);
+      TaskEntity entity = taskRepository.findById(id)
+          .orElseThrow(() -> new TaskServiceException(TASK_NOT_FOUND_MESSAGE + id));
+      entity.setBlocked(blocked);
+      TaskEntity updatedEntity = taskRepository.save(entity);
       return mapToResponseDto(updatedEntity);
-    } catch (TaskServiceException e) {
-      throw e;
     } catch (Exception e) {
       throw new TaskServiceException("Error updating task blocked status: " + e.getMessage());
     }
@@ -381,11 +371,9 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   private TaskSummaryDto getTaskSummaryLogic(String id) throws TaskServiceException {
     try {
-      taskEntity entity = taskRepository.findById(id)
-          .orElseThrow(() -> new TaskServiceException("Task not found with id: " + id));
+      TaskEntity entity = taskRepository.findById(id)
+          .orElseThrow(() -> new TaskServiceException(TASK_NOT_FOUND_MESSAGE + id));
       return mapToTaskSummaryDto(entity);
-    } catch (TaskServiceException e) {
-      throw e;
     } catch (Exception e) {
       throw new TaskServiceException("Error retrieving task summary: " + e.getMessage());
     }
@@ -393,8 +381,8 @@ public class TaskCrudServiceImpl implements TaskCrudService {
 
   // Private mapping methods
 
-  private taskEntity mapToEntity(TaskRequestDto dto) {
-    return taskEntity.builder()
+  private TaskEntity mapToEntity(TaskRequestDto dto) {
+    return TaskEntity.builder()
         .title(dto.getTitle())
         .description(dto.getDescription())
         .type(dto.getType())
@@ -402,16 +390,16 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         .projectId(dto.getProjectId())
         .assigneeId(dto.getAssigneeId())
         .subTasks(dto.getSubTasks())
-        .dueDate(new java.sql.Date(dto.getDueDate().getTime()))
-        .createdDate(dto.getCreatedDate() != null ? new java.sql.Date(dto.getCreatedDate().getTime()) : new java.sql.Date(System.currentTimeMillis()))
-        .startDate(dto.getStartDate() != null ? new java.sql.Date(dto.getStartDate().getTime()) : null)
+        .dueDate(new Date(dto.getDueDate().getTime()))
+        .createdDate(dto.getCreatedDate() != null ? new Date(dto.getCreatedDate().getTime()) : new Date(System.currentTimeMillis()))
+        .startDate(dto.getStartDate() != null ? new Date(dto.getStartDate().getTime()) : null)
         .priority(dto.getPriority())
         .effortPoints(dto.getEffortPoints() != null ? dto.getEffortPoints() : 0)
-        .blocked(dto.getBlocked() != null ? dto.getBlocked() : false)
+        .blocked(dto.getBlocked())
         .build();
   }
 
-  private TaskResponseDto mapToResponseDto(taskEntity entity) {
+  private TaskResponseDto mapToResponseDto(TaskEntity entity) {
     return TaskResponseDto.builder()
         .id(entity.getId())
         .title(entity.getTitle())
@@ -421,16 +409,16 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         .projectId(entity.getProjectId())
         .assigneeId(entity.getAssigneeId())
         .subTasks(entity.getSubTasks())
-        .dueDate(formatDate(entity.getDueDate()))
-        .createdDate(formatDate(entity.getCreatedDate()))
-        .startDate(formatDate(entity.getStartDate()))
+        .dueDate(entity.getDueDate())
+        .createdDate(entity.getCreatedDate())
+        .startDate(entity.getStartDate())
         .priority(entity.getPriority())
         .effortPoints(entity.getEffortPoints())
         .blocked(entity.getBlocked())
         .build();
   }
 
-  private TaskResponseCardDto mapToResponseCardDto(taskEntity entity) {
+  private TaskResponseCardDto mapToResponseCardDto(TaskEntity entity) {
     return TaskResponseCardDto.builder()
         .id(entity.getId())
         .title(entity.getTitle())
@@ -440,14 +428,14 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         .projectId(entity.getProjectId())
         .priority(entity.getPriority())
         .assigneeId(entity.getAssigneeId())
-        .dueDate(formatDate(entity.getDueDate()))
+        .dueDate(entity.getDueDate())
         .effortPoints(entity.getEffortPoints())
         .blocked(entity.getBlocked())
         .subTasks(entity.getSubTasks())
         .build();
   }
 
-  private TaskSummaryDto mapToTaskSummaryDto(taskEntity entity) {
+  private TaskSummaryDto mapToTaskSummaryDto(TaskEntity entity) {
     return TaskSummaryDto.builder()
         .id(entity.getId())
         .title(entity.getTitle())
@@ -460,12 +448,4 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         .build();
   }
 
-  private String formatDate(java.util.Date date) {
-    if (date == null) {
-      return null;
-    }
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-    return sdf.format(date);
-  }
 }
