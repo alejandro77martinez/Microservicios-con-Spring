@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @Validated
-@RequestMapping("/project")
 public class ProjectController {
 
   private final ProjectCrudService projectCrudService;

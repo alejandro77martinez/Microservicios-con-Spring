@@ -29,6 +29,8 @@ public interface TaskCrudService {
   ResponseEntity<List<TaskResponseDto>> getTasksByType(String type);
   
   ResponseEntity<List<TaskResponseDto>> getTasksByProjectId(String projectId);
+
+  ResponseEntity<List<TaskResponseDto>> getAllTasksByProjectsIds(List<String> projectsIds);
   
   ResponseEntity<List<TaskResponseDto>> getTasksByAssigneeId(String assigneeId);
   

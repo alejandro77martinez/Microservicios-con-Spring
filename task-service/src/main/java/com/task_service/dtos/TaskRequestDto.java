@@ -28,12 +28,12 @@ public class TaskRequestDto {
   private String description;
 
   @NotBlank(message = "Type is required")
-  @Pattern(regexp = "Bug|Feature|Enhancement|Documentation", 
-    message = "Type must be one of: Bug, Feature, Enhancement, Documentation")
+  @Pattern(regexp = "Error|Funcionalidad|Mejora|Documentación", 
+    message = "Type must be one of: Epica, Tarea, Sub Tarea")
   private String type;
 
   @NotBlank(message = "Status is required")
-  @Pattern(regexp = "Created|Pending|In Progress|Completed|Blocked", 
+  @Pattern(regexp = "Creada|En curso|En revision|Completada", 
     message = "Status must be one of: Created, Pending, In Progress, Completed, Blocked")
   private String status;
 
@@ -55,8 +55,8 @@ public class TaskRequestDto {
   private Date startDate;
 
   @NotBlank(message = "Priority is required")
-  @Pattern(regexp = "High|Medium|Low", 
-    message = "Priority must be one of: High, Medium, Low")
+  @Pattern(regexp = "Alta|Media|Baja", 
+    message = "Priority must be one of: Alta, Media, Baja")
   private String priority;
 
   @Min(value = 0, message = "Effort points must be at least 0")

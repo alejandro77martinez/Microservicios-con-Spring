@@ -95,10 +95,10 @@ class TaskControllerTest {
     when(taskCrudService.createTask(any(TaskRequestDto.class)))
         .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(taskResponseDto));
 
-    mockMvc.perform(post("/task")
+    mockMvc.perform(post("/")
         .contentType("application/json")
         .content(
-            "{\"title\":\"Test Task\",\"description\":\"Test Description\",\"type\":\"Feature\",\"status\":\"Pending\",\"projectId\":\"project123\",\"assigneeId\":\"user123\",\"dueDate\":\"2026-04-29T02:51:52.000Z\",\"createdDate\":\"2026-04-27T02:51:52.000Z\",\"priority\":\"High\",\"effortPoints\":5,\"blocked\":false}"))
+            "{\"title\":\"Test Task\",\"description\":\"Test Description\",\"type\":\"Feature\",\"status\":\"Pending\",\"projectId\":\"project123\",\"assigneeId\":\"user123\",\"dueDate\":\"2050-01-01T00:00:00.000Z\",\"createdDate\":\"2026-04-27T02:51:52.000Z\",\"priority\":\"High\",\"effortPoints\":5,\"blocked\":false}"))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").value("task123"))
         .andExpect(jsonPath("$.title").value("Test Task"));
@@ -110,7 +110,7 @@ class TaskControllerTest {
     when(taskCrudService.getAllTasks())
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/task"))
+    mockMvc.perform(get("/"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value("task123"))
         .andExpect(jsonPath("$[0].title").value("Test Task"));
@@ -121,7 +121,7 @@ class TaskControllerTest {
     when(taskCrudService.getTaskById("task123"))
         .thenReturn(ResponseEntity.ok(taskResponseDto));
 
-    mockMvc.perform(get("/task/task123"))
+    mockMvc.perform(get("/task123"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"))
         .andExpect(jsonPath("$.title").value("Test Task"));
@@ -132,10 +132,10 @@ class TaskControllerTest {
     when(taskCrudService.updateTask(eq("task123"), any(TaskRequestDto.class)))
         .thenReturn(ResponseEntity.ok(taskResponseDto));
 
-    mockMvc.perform(put("/task/task123")
+    mockMvc.perform(put("/task123")
         .contentType("application/json")
         .content(
-            "{\"title\":\"Updated Task\",\"description\":\"Updated Description\",\"type\":\"Feature\",\"status\":\"In Progress\",\"projectId\":\"project123\",\"assigneeId\":\"user123\",\"dueDate\":\"2026-04-29T02:51:52.000Z\",\"createdDate\":\"2026-04-27T02:51:52.000Z\",\"priority\":\"High\",\"effortPoints\":8,\"blocked\":false}"))
+            "{\"title\":\"Updated Task\",\"description\":\"Updated Description\",\"type\":\"Feature\",\"status\":\"In Progress\",\"projectId\":\"project123\",\"assigneeId\":\"user123\",\"dueDate\":\"2050-01-01T00:00:00.000Z\",\"createdDate\":\"2026-04-27T02:51:52.000Z\",\"priority\":\"High\",\"effortPoints\":8,\"blocked\":false}"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"));
   }
@@ -145,7 +145,7 @@ class TaskControllerTest {
     when(taskCrudService.deleteTask("task123"))
         .thenReturn(ResponseEntity.ok(apiResponseDto));
 
-    mockMvc.perform(delete("/task/task123"))
+    mockMvc.perform(delete("/task123"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value(200))
         .andExpect(jsonPath("$.message").value("Task deleted successfully"));
@@ -157,7 +157,7 @@ class TaskControllerTest {
     when(taskCrudService.getTasksByStatus("Pending"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/task/status/Pending"))
+    mockMvc.perform(get("/status/Pending"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].status").value("Pending"));
   }
@@ -168,7 +168,7 @@ class TaskControllerTest {
     when(taskCrudService.getTasksByPriority("High"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/task/priority/High"))
+    mockMvc.perform(get("/priority/High"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].priority").value("High"));
   }
@@ -179,7 +179,7 @@ class TaskControllerTest {
     when(taskCrudService.getTasksByType("Feature"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/task/type/Feature"))
+    mockMvc.perform(get("/type/Feature"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].type").value("Feature"));
   }
@@ -190,7 +190,7 @@ class TaskControllerTest {
     when(taskCrudService.getTasksByProjectId("project123"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/task/project/project123"))
+    mockMvc.perform(get("/project/project123"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].projectId").value("project123"));
   }
@@ -201,7 +201,7 @@ class TaskControllerTest {
     when(taskCrudService.getTasksByAssigneeId("user123"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/task/assignee/user123"))
+    mockMvc.perform(get("/assignee/user123"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].assigneeId").value("user123"));
   }
@@ -212,7 +212,7 @@ class TaskControllerTest {
     when(taskCrudService.getTasksByProjectIdAndStatus("project123", "Pending"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/task/project/project123/status/Pending"))
+    mockMvc.perform(get("/project/project123/status/Pending"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value("task123"));
   }
@@ -222,7 +222,7 @@ class TaskControllerTest {
     when(taskCrudService.updateTaskStatus("task123", "In Progress"))
         .thenReturn(ResponseEntity.ok(taskResponseDto));
 
-    mockMvc.perform(put("/task/task123/status/In Progress"))
+    mockMvc.perform(put("/task123/status/In Progress"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"));
   }
@@ -232,7 +232,7 @@ class TaskControllerTest {
     when(taskCrudService.updateTaskPriority("task123", "Medium"))
         .thenReturn(ResponseEntity.ok(taskResponseDto));
 
-    mockMvc.perform(put("/task/task123/priority/Medium"))
+    mockMvc.perform(put("/task123/priority/Medium"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"));
   }
@@ -242,7 +242,7 @@ class TaskControllerTest {
     when(taskCrudService.updateTaskEffortPoints("task123", 10))
         .thenReturn(ResponseEntity.ok(taskResponseDto));
 
-    mockMvc.perform(put("/task/task123/effortPoints/10"))
+    mockMvc.perform(put("/task123/effortPoints/10"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"));
   }
@@ -252,7 +252,7 @@ class TaskControllerTest {
     when(taskCrudService.updateTaskBlocked("task123", true))
         .thenReturn(ResponseEntity.ok(taskResponseDto));
 
-    mockMvc.perform(put("/task/task123/blocked/true"))
+    mockMvc.perform(put("/task123/blocked/true"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"));
   }
@@ -262,7 +262,7 @@ class TaskControllerTest {
     when(taskCrudService.getTaskSummary("task123"))
         .thenReturn(ResponseEntity.ok(taskSummaryDto));
 
-    mockMvc.perform(get("/task/task123/summary"))
+    mockMvc.perform(get("/task123/summary"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"))
         .andExpect(jsonPath("$.title").value("Test Task"));
@@ -270,7 +270,7 @@ class TaskControllerTest {
 
   @Test
   void createTask_WithInvalidData_ShouldReturnBadRequest() throws Exception {
-    mockMvc.perform(post("/task")
+    mockMvc.perform(post("/")
         .contentType("application/json")
         .content("""
                 {
@@ -287,13 +287,13 @@ class TaskControllerTest {
 
   @Test
   void getTaskById_WithBlankId_ShouldReturnBadRequest() throws Exception {
-    mockMvc.perform(get("/task/ "))
+    mockMvc.perform(get("/ "))
         .andExpect(status().isBadRequest());
   }
 
   @Test
   void getTasksByStatus_WithInvalidStatus_ShouldReturnBadRequest() throws Exception {
-    mockMvc.perform(get("/task/status/InvalidStatus"))
+    mockMvc.perform(get("/status/InvalidStatus"))
         .andExpect(status().isBadRequest());
   }
 }

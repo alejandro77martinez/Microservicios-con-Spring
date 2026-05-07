@@ -48,7 +48,7 @@ class ProjectControllerTest {
     when(projectCrudService.createProject(any(ProjectRequestDto.class)))
         .thenReturn(ResponseEntity.ok(responseDto));
 
-    mockMvc.perform(post("/project")
+    mockMvc.perform(post("/")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isOk())
@@ -61,7 +61,7 @@ class ProjectControllerTest {
     when(projectCrudService.getAllProjects())
         .thenReturn(ResponseEntity.ok(List.of(responseDto)));
 
-    mockMvc.perform(get("/project"))
+    mockMvc.perform(get("/"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(responseDto.getId()));
   }
@@ -72,7 +72,7 @@ class ProjectControllerTest {
     when(projectCrudService.getProjectById("id-123"))
         .thenReturn(ResponseEntity.ok(responseDto));
 
-    mockMvc.perform(get("/project/id-123"))
+    mockMvc.perform(get("/id-123"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value(responseDto.getName()));
   }
@@ -83,7 +83,7 @@ class ProjectControllerTest {
     when(projectCrudService.getProjectsByClient("Cliente A"))
         .thenReturn(ResponseEntity.ok(List.of(responseDto)));
 
-    mockMvc.perform(get("/project/client/{clientName}", "Cliente A"))
+    mockMvc.perform(get("/client/{clientName}", "Cliente A"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].client").value(responseDto.getClient()));
   }
@@ -94,7 +94,7 @@ class ProjectControllerTest {
     when(projectCrudService.getProjectsByPriority("Alta"))
         .thenReturn(ResponseEntity.ok(List.of(responseDto)));
 
-    mockMvc.perform(get("/project/priority/Alta"))
+    mockMvc.perform(get("/priority/Alta"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].priority").value(responseDto.getPriority()));
   }
@@ -105,7 +105,7 @@ class ProjectControllerTest {
     when(projectCrudService.searchProjectsByTag("tag1"))
         .thenReturn(ResponseEntity.ok(List.of(responseDto)));
 
-    mockMvc.perform(get("/project/search/tag/tag1"))
+    mockMvc.perform(get("/search/tag/tag1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].tags[0]").value("tag1"));
   }
@@ -118,7 +118,7 @@ class ProjectControllerTest {
     when(projectCrudService.updateProject(eq("id-123"), any(ProjectRequestDto.class)))
         .thenReturn(ResponseEntity.ok(responseDto));
 
-    mockMvc.perform(put("/project/id-123")
+    mockMvc.perform(put("/id-123")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isOk())
@@ -135,7 +135,7 @@ class ProjectControllerTest {
     when(projectCrudService.deleteProject("id-123"))
         .thenReturn(ResponseEntity.ok(apiResponse));
 
-    mockMvc.perform(delete("/project/id-123"))
+    mockMvc.perform(delete("/id-123"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value(200));
   }
@@ -155,7 +155,7 @@ class ProjectControllerTest {
     when(projectCrudService.getProjectSummary("id-123"))
         .thenReturn(ResponseEntity.ok(summaryDto));
 
-    mockMvc.perform(get("/project/id-123/summary"))
+    mockMvc.perform(get("/id-123/summary"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.teamSize").value(2));
   }

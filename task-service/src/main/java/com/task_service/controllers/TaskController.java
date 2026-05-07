@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/task")
 public class TaskController {
 
   private final TaskCrudService taskCrudService;
@@ -139,5 +138,11 @@ public class TaskController {
   public ResponseEntity<TaskSummaryDto> getTaskSummary(
       @PathVariable @NotBlank(message = "Task ID cannot be blank") String taskId) {
     return taskCrudService.getTaskSummary(taskId);
+  }
+
+  @PostMapping("/byprojects")
+  public ResponseEntity<List<TaskResponseDto>> getAllTasksByProjectsIds(
+      @RequestBody List<String> projectsIds) {
+    return taskCrudService.getAllTasksByProjectsIds(projectsIds);
   }
 }

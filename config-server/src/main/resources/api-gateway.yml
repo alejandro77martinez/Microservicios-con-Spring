@@ -51,6 +51,22 @@ spring:
                 - Path=/api/v1/project/**
               filters:
                 - name: JwtAuthFilter
+            
+            - id: task-service
+              uri: lb://task-service
+              order: 4
+              predicates:
+                - Path=/api/v1/task/**
+              filters:
+                - name: JwtAuthFilter
+              
+            - id: service-registry
+              uri: http://service-registry:8761
+              order: 5
+              predicates:
+                - Path=/api/v1/registry/**
+              filters:
+                - name: JwtAuthFilter
 
 logging:
   level:

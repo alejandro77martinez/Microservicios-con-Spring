@@ -116,6 +116,15 @@ public class TaskCrudServiceImpl implements TaskCrudService {
   }
 
   @Override
+  public ResponseEntity<List<TaskResponseDto>> getAllTasksByProjectsIds(List<String> projectsIds) {
+    try {
+      return ResponseEntity.ok(getAllTasksByProjectsIdsLogic(projectsIds));
+    } catch (TaskServiceException e) {
+      throw new BadRequestException(e.getMessage());
+    }
+  }
+
+  @Override
   public ResponseEntity<List<TaskResponseDto>> getTasksByAssigneeId(String assigneeId) {
     try {
       return ResponseEntity.ok(getTasksByAssigneeIdLogic(assigneeId));
@@ -300,6 +309,15 @@ public class TaskCrudServiceImpl implements TaskCrudService {
     }
   }
 
+  private List<TaskResponseDto> getAllTasksByProjectsIdsLogic(List<String> projectsIds) throws TaskServiceException {
+    try {
+      List<TaskEntity> tasks = taskRepository.findByProjectIdIn(projectsIds);
+      return tasks.stream().map(this::mapToResponseDto).toList();
+    } catch (Exception e) {
+      throw new TaskServiceException("Error retrieving tasks by project IDs: " + e.getMessage());
+    }
+  }
+
   private List<TaskResponseDto> getTasksByAssigneeIdLogic(String assigneeId) throws TaskServiceException {
     try {
       List<TaskEntity> tasks = taskRepository.findByAssigneeId(assigneeId);
@@ -447,5 +465,4 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         .blocked(entity.getBlocked())
         .build();
   }
-
 }

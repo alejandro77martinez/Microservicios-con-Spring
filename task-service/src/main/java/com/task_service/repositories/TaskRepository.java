@@ -19,4 +19,5 @@ public interface TaskRepository extends MongoRepository<TaskEntity, String> {
   List<TaskEntity> findByBlocked(Boolean blocked);
   List<TaskEntity> findByProjectIdAndStatus(String projectId, String status);
   List<TaskEntity> findByProjectIdAndPriority(String projectId, String priority);
+  List<TaskEntity> findByProjectIdIn(List<String> projectIds);
 }
