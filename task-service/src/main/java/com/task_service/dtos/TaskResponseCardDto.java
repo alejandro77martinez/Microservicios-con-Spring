@@ -1,6 +1,5 @@
 package com.task_service.dtos;
 
-import java.util.List;
 import java.util.Date;
 
 import lombok.Data;
@@ -20,5 +19,5 @@ public class TaskResponseCardDto {
   private Date dueDate;
   private Integer effortPoints;
   private Boolean blocked;
-  private List<String> subTasks;
+  private String parentTaskId;
 }

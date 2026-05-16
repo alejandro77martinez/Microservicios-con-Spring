@@ -1,7 +1,6 @@
 package com.task_service.dtos;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.Builder;
@@ -16,7 +15,7 @@ public class TaskResponseDto {
   private String status;
   private String projectId;
   private String assigneeId;
-  private List<String> subTasks;
+  private String parentTaskId;
   private Date dueDate;
   private Date createdDate;
   private Date startDate;

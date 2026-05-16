@@ -328,6 +328,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
         .id(entity.getId())
         .name(entity.getName())
         .client(entity.getClient())
+        .creator(entity.getUserCreated().getUserId())
         .role(findRoleForUser(entity, userId))
         .summary(entity.getSummary())
         .priority(entity.getPriority())

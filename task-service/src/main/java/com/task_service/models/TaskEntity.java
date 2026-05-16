@@ -3,7 +3,6 @@ package com.task_service.models;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import lombok.AllArgsConstructor;
@@ -28,7 +27,7 @@ public class TaskEntity {
   private String status;
   private String projectId;
   private String assigneeId;
-  private List<String> subTasks;
+  private String parentTaskId;
   private Date dueDate;
   private Date createdDate;
   private Date startDate;

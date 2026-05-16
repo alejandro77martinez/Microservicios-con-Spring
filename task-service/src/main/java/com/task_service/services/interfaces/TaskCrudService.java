@@ -20,6 +20,8 @@ public interface TaskCrudService {
   ResponseEntity<TaskResponseDto> updateTask(String id, TaskRequestDto dto);
   
   ResponseEntity<ApiResponseDto> deleteTask(String id);
+
+  ResponseEntity<ApiResponseDto> deleteTaskSet(List<String> ids);
   
   // Queries by criteria
   ResponseEntity<List<TaskResponseDto>> getTasksByStatus(String status);

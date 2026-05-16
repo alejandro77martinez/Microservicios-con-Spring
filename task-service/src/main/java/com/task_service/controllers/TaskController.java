@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -56,10 +58,15 @@ public class TaskController {
     return taskCrudService.deleteTask(taskId);
   }
 
+  @DeleteMapping("/set")
+  public ResponseEntity<ApiResponseDto> deleteTaskSet(@RequestBody @NotEmpty @NotNull List<String> ids) {
+    return taskCrudService.deleteTaskSet(ids);
+  }
+
   @GetMapping("/status/{status}")
   public ResponseEntity<List<TaskResponseDto>> getTasksByStatus(
       @PathVariable @NotBlank(message = "Status cannot be blank")
-      @Pattern(regexp = "Created|Pending|In Progress|Completed|Blocked", 
+      @Pattern(regexp = "Creada|En curso|En revision|Completada", 
         message = "Status must be one of: Created, Pending, In Progress, Completed, Blocked") String status) {
     return taskCrudService.getTasksByStatus(status);
   }
@@ -67,7 +74,7 @@ public class TaskController {
   @GetMapping("/priority/{priority}")
   public ResponseEntity<List<TaskResponseDto>> getTasksByPriority(
       @PathVariable @NotBlank(message = "Priority cannot be blank")
-      @Pattern(regexp = "High|Medium|Low", 
+      @Pattern(regexp = "Alta|Media|Baja", 
         message = "Priority must be one of: High, Medium, Low") String priority) {
     return taskCrudService.getTasksByPriority(priority);
   }
@@ -75,7 +82,7 @@ public class TaskController {
   @GetMapping("/type/{type}")
   public ResponseEntity<List<TaskResponseDto>> getTasksByType(
       @PathVariable @NotBlank(message = "Type cannot be blank")
-      @Pattern(regexp = "Bug|Feature|Enhancement|Documentation", 
+      @Pattern(regexp = "Error|Funcionalidad|Mejora|Documentación", 
         message = "Type must be one of: Bug, Feature, Enhancement, Documentation") String type) {
     return taskCrudService.getTasksByType(type);
   }
@@ -96,8 +103,8 @@ public class TaskController {
   public ResponseEntity<List<TaskResponseCardDto>> getTasksByProjectIdAndStatus(
       @PathVariable @NotBlank(message = "Project ID cannot be blank") String projectId,
       @PathVariable @NotBlank(message = "Status cannot be blank")
-      @Pattern(regexp = "Pending|In Progress|Completed|Blocked", 
-        message = "Status must be one of: Pending, In Progress, Completed, Blocked") String status) {
+      @Pattern(regexp = "Creada|En curso|En revision|Completada", 
+        message = "Status must be one of: Created, Pending, In Progress, Completed, Blocked") String status) {
     return taskCrudService.getTasksByProjectIdAndStatus(projectId, status);
   }
 
@@ -105,8 +112,8 @@ public class TaskController {
   public ResponseEntity<TaskResponseDto> updateTaskStatus(
       @PathVariable @NotBlank(message = "Task ID cannot be blank") String taskId,
       @PathVariable @NotBlank(message = "Status cannot be blank")
-      @Pattern(regexp = "Pending|In Progress|Completed|Blocked", 
-        message = "Status must be one of: Pending, In Progress, Completed, Blocked") String status) {
+      @Pattern(regexp = "Creada|En curso|En revision|Completada", 
+        message = "Status must be one of: Creada, En curso, En revision, Completada") String status) {
     return taskCrudService.updateTaskStatus(taskId, status);
   }
 
@@ -114,8 +121,8 @@ public class TaskController {
   public ResponseEntity<TaskResponseDto> updateTaskPriority(
       @PathVariable @NotBlank(message = "Task ID cannot be blank") String taskId,
       @PathVariable @NotBlank(message = "Priority cannot be blank")
-      @Pattern(regexp = "High|Medium|Low", 
-        message = "Priority must be one of: High, Medium, Low") String priority) {
+      @Pattern(regexp = "Alta|Media|Baja", 
+        message = "Priority must be one of: Alta, Media, Baja") String priority) {
     return taskCrudService.updateTaskPriority(taskId, priority);
   }
 

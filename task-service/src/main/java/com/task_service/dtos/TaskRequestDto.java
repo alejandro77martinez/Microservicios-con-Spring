@@ -10,7 +10,6 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Future;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.Builder;
@@ -29,7 +28,7 @@ public class TaskRequestDto {
 
   @NotBlank(message = "Type is required")
   @Pattern(regexp = "Error|Funcionalidad|Mejora|Documentación", 
-    message = "Type must be one of: Epica, Tarea, Sub Tarea")
+    message = "Type must be one of: Error, Funcionalidad, Mejora or Documentación")
   private String type;
 
   @NotBlank(message = "Status is required")
@@ -42,7 +41,7 @@ public class TaskRequestDto {
 
   private String assigneeId;
 
-  private List<String> subTasks;
+  private String parentTaskId;
 
   @NotNull(message = "Due date is required")
   @Future(message = "Due date must be in the future")

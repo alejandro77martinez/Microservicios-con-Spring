@@ -77,6 +77,15 @@ public class TaskCrudServiceImpl implements TaskCrudService {
     }
   }
 
+  @Override
+  public ResponseEntity<ApiResponseDto> deleteTaskSet(List<String> ids) {
+    try {
+      return ResponseEntity.ok(deleteTaskSetLogic(ids));
+    } catch (TaskServiceException e) {
+      throw new ResourceNotFoundException(e.getMessage());
+    }
+  }
+
   // Queries by criteria
 
   @Override
@@ -242,7 +251,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
       entity.setStatus(dto.getStatus());
       entity.setProjectId(dto.getProjectId());
       entity.setAssigneeId(dto.getAssigneeId());
-      entity.setSubTasks(dto.getSubTasks());
+      entity.setParentTaskId(dto.getParentTaskId());
       entity.setDueDate(new Date(dto.getDueDate().getTime()));
       entity.setStartDate(dto.getStartDate() != null ? new Date(dto.getStartDate().getTime()) : null);
       entity.setPriority(dto.getPriority());
@@ -263,6 +272,23 @@ public class TaskCrudServiceImpl implements TaskCrudService {
       taskRepository.findById(id)
         .orElseThrow(() -> new TaskServiceException(TASK_NOT_FOUND_MESSAGE + id));
       taskRepository.deleteById(id);
+      return ApiResponseDto.builder()
+          .status(HttpStatus.OK.value())
+          .message("Task deleted successfully")
+          .timestamp(new Date())
+          .build();
+    } catch (Exception e) {
+      throw new TaskServiceException("Error deleting task: " + e.getMessage());
+    }
+  }
+
+  private ApiResponseDto deleteTaskSetLogic(List<String> ids) throws TaskServiceException {
+    try {
+      List<TaskEntity> tasks = taskRepository.findAllById(ids);
+      if (tasks.size() != ids.size()) {
+        throw new TaskServiceException("Error deleting, task not found");
+      }
+      taskRepository.deleteAllById(ids);
       return ApiResponseDto.builder()
           .status(HttpStatus.OK.value())
           .message("Task deleted successfully")
@@ -407,7 +433,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         .status(dto.getStatus())
         .projectId(dto.getProjectId())
         .assigneeId(dto.getAssigneeId())
-        .subTasks(dto.getSubTasks())
+        .parentTaskId(dto.getParentTaskId())
         .dueDate(new Date(dto.getDueDate().getTime()))
         .createdDate(dto.getCreatedDate() != null ? new Date(dto.getCreatedDate().getTime()) : new Date(System.currentTimeMillis()))
         .startDate(dto.getStartDate() != null ? new Date(dto.getStartDate().getTime()) : null)
@@ -426,7 +452,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         .status(entity.getStatus())
         .projectId(entity.getProjectId())
         .assigneeId(entity.getAssigneeId())
-        .subTasks(entity.getSubTasks())
+        .parentTaskId(entity.getParentTaskId())
         .dueDate(entity.getDueDate())
         .createdDate(entity.getCreatedDate())
         .startDate(entity.getStartDate())
@@ -449,7 +475,7 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         .dueDate(entity.getDueDate())
         .effortPoints(entity.getEffortPoints())
         .blocked(entity.getBlocked())
-        .subTasks(entity.getSubTasks())
+        .parentTaskId(entity.getParentTaskId())
         .build();
   }
 
@@ -465,4 +491,5 @@ public class TaskCrudServiceImpl implements TaskCrudService {
         .blocked(entity.getBlocked())
         .build();
   }
+
 }

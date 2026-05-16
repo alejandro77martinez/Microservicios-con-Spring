@@ -12,6 +12,7 @@ public class ProjectResponseCardDto {
   private String id;
   private String name;
   private String client;
+  private String creator;
   private String role;
   private String summary;
   private String priority;
