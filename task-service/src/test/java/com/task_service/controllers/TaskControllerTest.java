@@ -47,13 +47,13 @@ class TaskControllerTest {
         .id("task123")
         .title("Test Task")
         .description("Test Description")
-        .type("Feature")
-        .status("Pending")
+        .type("Error")
+        .status("En curso")
         .projectId("project123")
         .assigneeId("user123")
         .dueDate(new Date())
         .createdDate(new Date())
-        .priority("High")
+        .priority("Alta")
         .effortPoints(5)
         .blocked(false)
         .build();
@@ -62,10 +62,10 @@ class TaskControllerTest {
         .id("task123")
         .title("Test Task")
         .description("Test Description")
-        .type("Feature")
-        .status("Pending")
+        .type("Error")
+        .status("En curso")
         .projectId("project123")
-        .priority("High")
+        .priority("Alta")
         .assigneeId("user123")
         .dueDate(new Date())
         .effortPoints(5)
@@ -76,9 +76,9 @@ class TaskControllerTest {
         .id("task123")
         .title("Test Task")
         .projectId("project123")
-        .status("Pending")
-        .priority("High")
-        .type("Feature")
+        .status("En curso")
+        .priority("Alta")
+        .type("Error")
         .effortPoints(5)
         .blocked(false)
         .build();
@@ -98,7 +98,7 @@ class TaskControllerTest {
     mockMvc.perform(post("/")
         .contentType("application/json")
         .content(
-            "{\"title\":\"Test Task\",\"description\":\"Test Description\",\"type\":\"Feature\",\"status\":\"Pending\",\"projectId\":\"project123\",\"assigneeId\":\"user123\",\"dueDate\":\"2050-01-01T00:00:00.000Z\",\"createdDate\":\"2026-04-27T02:51:52.000Z\",\"priority\":\"High\",\"effortPoints\":5,\"blocked\":false}"))
+            "{\"title\":\"Test Task\",\"description\":\"Test Description\",\"type\":\"Funcionalidad\",\"status\":\"Creada\",\"projectId\":\"project123\",\"assigneeId\":\"user123\",\"dueDate\":\"2050-01-01T00:00:00.000Z\",\"createdDate\":\"2026-04-27T02:51:52.000Z\",\"priority\":\"Alta\",\"effortPoints\":5,\"blocked\":false}"))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").value("task123"))
         .andExpect(jsonPath("$.title").value("Test Task"));
@@ -135,7 +135,7 @@ class TaskControllerTest {
     mockMvc.perform(put("/task123")
         .contentType("application/json")
         .content(
-            "{\"title\":\"Updated Task\",\"description\":\"Updated Description\",\"type\":\"Feature\",\"status\":\"In Progress\",\"projectId\":\"project123\",\"assigneeId\":\"user123\",\"dueDate\":\"2050-01-01T00:00:00.000Z\",\"createdDate\":\"2026-04-27T02:51:52.000Z\",\"priority\":\"High\",\"effortPoints\":8,\"blocked\":false}"))
+            "{\"title\":\"Updated Task\",\"description\":\"Updated Description\",\"type\":\"Error\",\"status\":\"En curso\",\"projectId\":\"project123\",\"assigneeId\":\"user123\",\"dueDate\":\"2050-01-01T00:00:00.000Z\",\"createdDate\":\"2026-04-27T02:51:52.000Z\",\"priority\":\"Alta\",\"effortPoints\":8,\"blocked\":false}"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"));
   }
@@ -154,34 +154,34 @@ class TaskControllerTest {
   @Test
   void getTasksByStatus_ShouldReturnFilteredTasks() throws Exception {
     List<TaskResponseDto> taskList = Arrays.asList(taskResponseDto);
-    when(taskCrudService.getTasksByStatus("Pending"))
+    when(taskCrudService.getTasksByStatus("En curso"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/status/Pending"))
+    mockMvc.perform(get("/status/En curso"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].status").value("Pending"));
+        .andExpect(jsonPath("$[0].status").value("En curso"));
   }
 
   @Test
   void getTasksByPriority_ShouldReturnFilteredTasks() throws Exception {
     List<TaskResponseDto> taskList = Arrays.asList(taskResponseDto);
-    when(taskCrudService.getTasksByPriority("High"))
+    when(taskCrudService.getTasksByPriority("Alta"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/priority/High"))
+    mockMvc.perform(get("/priority/Alta"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].priority").value("High"));
+        .andExpect(jsonPath("$[0].priority").value("Alta"));
   }
 
   @Test
   void getTasksByType_ShouldReturnFilteredTasks() throws Exception {
     List<TaskResponseDto> taskList = Arrays.asList(taskResponseDto);
-    when(taskCrudService.getTasksByType("Feature"))
+    when(taskCrudService.getTasksByType("Error"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/type/Feature"))
+    mockMvc.perform(get("/type/Error"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].type").value("Feature"));
+        .andExpect(jsonPath("$[0].type").value("Error"));
   }
 
   @Test
@@ -209,30 +209,30 @@ class TaskControllerTest {
   @Test
   void getTasksByProjectIdAndStatus_ShouldReturnFilteredTasks() throws Exception {
     List<TaskResponseCardDto> taskList = Arrays.asList(taskResponseCardDto);
-    when(taskCrudService.getTasksByProjectIdAndStatus("project123", "Pending"))
+    when(taskCrudService.getTasksByProjectIdAndStatus("project123", "Creada"))
         .thenReturn(ResponseEntity.ok(taskList));
 
-    mockMvc.perform(get("/project/project123/status/Pending"))
+    mockMvc.perform(get("/project/project123/status/Creada"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value("task123"));
   }
 
   @Test
   void updateTaskStatus_ShouldReturnUpdatedTask() throws Exception {
-    when(taskCrudService.updateTaskStatus("task123", "In Progress"))
+    when(taskCrudService.updateTaskStatus("task123", "En curso"))
         .thenReturn(ResponseEntity.ok(taskResponseDto));
 
-    mockMvc.perform(put("/task123/status/In Progress"))
+    mockMvc.perform(put("/task123/status/En curso"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"));
   }
 
   @Test
   void updateTaskPriority_ShouldReturnUpdatedTask() throws Exception {
-    when(taskCrudService.updateTaskPriority("task123", "Medium"))
+    when(taskCrudService.updateTaskPriority("task123", "Media"))
         .thenReturn(ResponseEntity.ok(taskResponseDto));
 
-    mockMvc.perform(put("/task123/priority/Medium"))
+    mockMvc.perform(put("/task123/priority/Media"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("task123"));
   }
