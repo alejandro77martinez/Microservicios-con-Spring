@@ -4,7 +4,7 @@ services:
       context: ./service-registry
     container_name: service-registry-spring
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8761/api/v1/registry"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -41,7 +41,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 60s
     environment:
       - SERVICE_REGISTRY_HOST=${SERVICE_REGISTRY_HOST}
       - CONFIG_SERVER_HOST=${CONFIG_SERVER_HOST}
@@ -64,13 +64,33 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 60s
     environment:
       - SERVICE_REGISTRY_HOST=${SERVICE_REGISTRY_HOST}
       - CONFIG_SERVER_HOST=${CONFIG_SERVER_HOST}
       - MONGO_DB_URI=${MONGO_DB_URI_PROJECT}
     depends_on:
-      config-server:
+      auth-service:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  task-service:
+    build:
+      context: ./task-service
+    container_name: task-service-spring
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8087/api/v1/task"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    environment:
+      - SERVICE_REGISTRY_HOST=${SERVICE_REGISTRY_HOST}
+      - CONFIG_SERVER_HOST=${CONFIG_SERVER_HOST}
+      - MONGO_DB_URI=${MONGO_DB_URI_TASK}
+    depends_on:
+      project-service:
         condition: service_healthy
     networks:
       - app-network
@@ -85,11 +105,7 @@ services:
       - SERVICE_REGISTRY_HOST=${SERVICE_REGISTRY_HOST}
       - CONFIG_SERVER_HOST=${CONFIG_SERVER_HOST}
     depends_on:
-      config-server:
-        condition: service_healthy
-      auth-service:
-        condition: service_healthy
-      project-service:
+      task-service:
         condition: service_healthy
     networks:
       - app-network

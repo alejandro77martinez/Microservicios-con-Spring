@@ -31,8 +31,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<ProjectResponseDto> createProject(ProjectRequestDto projectRequestDto) {
     try {
-      ProjectResponseDto response = createProjectLogic(projectRequestDto);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(createProjectLogic(projectRequestDto));
     } catch (ProjectServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -41,8 +40,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<List<ProjectResponseDto>> getAllProjects() {
     try {
-      List<ProjectResponseDto> response = getAllProjectsLogic();
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(getAllProjectsLogic());
     } catch (Exception e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -51,8 +49,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<ProjectResponseDto> getProjectById(String projectId) {
     try {
-      ProjectResponseDto response = getProjectByIdLogic(projectId);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(getProjectByIdLogic(projectId));
     } catch (ProjectServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -61,8 +58,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<List<ProjectResponseDto>> getProjectsByClient(String clientName) {
     try {
-      List<ProjectResponseDto> response = getProjectsByClientLogic(clientName);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(getProjectsByClientLogic(clientName));
     } catch (Exception e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -71,8 +67,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<List<ProjectResponseDto>> getProjectsByPriority(String priority) {
     try {
-      List<ProjectResponseDto> response = getProjectsByPriorityLogic(priority);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(getProjectsByPriorityLogic(priority));
     } catch (Exception e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -81,8 +76,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<List<ProjectResponseCardDto>> getProjectsByUser(String userId) {
     try {
-      List<ProjectResponseCardDto> response = getProjectsByUserLogic(userId);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(getProjectsByUserLogic(userId));
     } catch (Exception e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -91,8 +85,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<List<ProjectResponseDto>> searchProjectsByTag(String tag) {
     try {
-      List<ProjectResponseDto> response = searchProjectsByTagLogic(tag);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(searchProjectsByTagLogic(tag));
     } catch (Exception e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -101,8 +94,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<ProjectResponseDto> updateProject(String projectId, ProjectRequestDto projectRequestDto) {
     try {
-      ProjectResponseDto response = updateProjectLogic(projectId, projectRequestDto);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(updateProjectLogic(projectId, projectRequestDto));
     } catch (ProjectServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -111,8 +103,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<ApiResponseDto> deleteProject(String projectId) {
     try {
-      ApiResponseDto response = deleteProjectLogic(projectId);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(deleteProjectLogic(projectId));
     } catch (ProjectServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -121,8 +112,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<ProjectSummaryDto> getProjectSummary(String projectId) {
     try {
-      ProjectSummaryDto response = getProjectSummaryLogic(projectId);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(getProjectSummaryLogic(projectId));
     } catch (ProjectServiceException e) {
       throw new ResourceNotFoundException(e.getMessage());
     }
@@ -131,8 +121,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<ProjectResponseDto> updateProgressProject(String projectId, Integer progress) {
     try {
-      ProjectResponseDto response = updateProgressProjectLogic(projectId, progress);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(updateProgressProjectLogic(projectId, progress));
     } catch (ProjectServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -141,8 +130,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<ProjectResponseDto> updateHealthProject(String projectId, String health) {
     try {
-      ProjectResponseDto response = updateHealthProjectLogic(projectId, health);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(updateHealthProjectLogic(projectId, health));
     } catch (ProjectServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -151,8 +139,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
   @Override
   public ResponseEntity<ProjectResponseDto> updatePriorityProject(String projectId, String priority) {
     try {
-      ProjectResponseDto response = updatePriorityProjectLogic(projectId, priority);
-      return ResponseEntity.ok(response);
+      return ResponseEntity.ok(updatePriorityProjectLogic(projectId, priority));
     } catch (ProjectServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -341,6 +328,7 @@ public class ProjectCrudServiceImpl implements ProjectCrudService {
         .id(entity.getId())
         .name(entity.getName())
         .client(entity.getClient())
+        .creator(entity.getUserCreated().getUserId())
         .role(findRoleForUser(entity, userId))
         .summary(entity.getSummary())
         .priority(entity.getPriority())

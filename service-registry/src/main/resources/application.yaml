@@ -4,6 +4,8 @@ spring:
 
 server:
   port: ${SERVICE_REGISTRY_PORT:8761}
+  servlet:
+    context-path: /api/v1/registry
 
 eureka:
   instance:
@@ -12,4 +14,4 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/ 
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/api/v1/registry/eureka/ 

@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: task-service
+  data:
+    mongodb:
+      uri: ${MONGO_DB_URI}
+  config:
+    import: "optional:configserver:http://${CONFIG_SERVER_HOST:localhost}:8888"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${SERVICE_REGISTRY_HOST:localhost}:8761/api/v1/registry/eureka/
