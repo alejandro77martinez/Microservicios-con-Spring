@@ -1,6 +1,6 @@
 # 🚀 Microservicios-con-Spring 
 
-Sistema backend de la aplicacion web -TaskManager- para la gestion de tareas de proyectos usando el marco de trabajo kanban. Este cuenta con la implementa un servicio de autenticacion usando cookies y JWT, un servicio para la gestion del proyecto y otro para la gestion de tareas.
+Sistema backend de la aplicacion -TaskManager- la cual tiene como proposito realizar la gestion de tareas de proyectos de software bajo un marco de trabajo kanban. El sistema cuenta con la implementacion de varios microservicios que cumplen una funcion o caso de uso, como por ejemplo un servicio de autenticacion usando cookies y JWT, un servicio para la gestion de proyectos y otro para la gestion de tareas, asi como otros servicios que satisfacen requisitos arquitectonicos dentro de todo el sistema backend.
 
 ## 🏛 Arquitectura del Sistema
 
