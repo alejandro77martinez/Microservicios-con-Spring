@@ -1,6 +1,7 @@
 package com.auth_service.controllers;
 
 import com.auth_service.dtos.LoginRequest;
+import com.auth_service.dtos.UserResponse;
 import com.auth_service.dtos.ValidateTokenRequest;
 import com.auth_service.services.interfaces.AuthService;
 import org.junit.jupiter.api.Test;
@@ -61,5 +62,29 @@ class AuthControllerTest {
     assertEquals(200, response.getStatusCode().value());
     assertEquals("new-token", response.getBody());
     verify(userService).refreshToken("token");
+  }
+
+  @Test
+  void getUserSessionShouldDelegateToUserService() {
+    ValidateTokenRequest request = ValidateTokenRequest.builder().token("token").build();
+    UserResponse user = UserResponse.builder().email("user@test.com").build();
+    when(userService.getUserLogged("token")).thenReturn(ResponseEntity.ok(user));
+
+    ResponseEntity<UserResponse> response = controller.getUserSession(request);
+
+    assertEquals(200, response.getStatusCode().value());
+    assertEquals("user@test.com", response.getBody().getEmail());
+    verify(userService).getUserLogged("token");
+  }
+
+  @Test
+  void logoutShouldDelegateToUserService() {
+    when(userService.logout()).thenReturn(ResponseEntity.ok("Logout successful"));
+
+    ResponseEntity<String> response = controller.logout();
+
+    assertEquals(200, response.getStatusCode().value());
+    assertEquals("Logout successful", response.getBody());
+    verify(userService).logout();
   }
 }

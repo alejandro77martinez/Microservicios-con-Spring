@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
@@ -139,5 +140,45 @@ class AuthServiceImplTest {
     );
 
     assertEquals("User not found with email: missing@test.com", exception.getMessage());
+  }
+
+  @Test
+  void refreshTokenShouldReturnDeleteCookieWhenRefreshTokenIsEmpty() {
+    when(jwtService.refreshToken("token")).thenReturn("");
+
+    ResponseEntity<String> response = authService.refreshToken("token");
+
+    assertEquals(200, response.getStatusCode().value());
+    assertEquals("Refresh successful", response.getBody());
+    String setCookie = response.getHeaders().getFirst("Set-Cookie");
+    assertTrue(setCookie.contains("Max-Age=0"));
+  }
+
+  @Test
+  void logoutShouldClearContextAndReturnEmptyCookie() {
+    ResponseEntity<String> response = authService.logout();
+
+    assertEquals(200, response.getStatusCode().value());
+    assertEquals("Logout successful", response.getBody());
+    String setCookie = response.getHeaders().getFirst("Set-Cookie");
+    assertTrue(setCookie.contains("Max-Age=0"));
+    assertTrue(setCookie.contains("AUTH_TOKEN="));
+  }
+
+  @Test
+  void getUserLoggedShouldUseDefaultAvatarWhenUserHasNoAvatar() {
+    when(jwtService.getUserFromToken("token")).thenReturn("user@test.com");
+    when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(UserEntity.builder()
+      .id("123")
+      .name("User")
+      .lastName("Test")
+      .email("user@test.com")
+      .roles(List.of("USER"))
+      .avatar("   ")
+      .build()));
+
+    ResponseEntity<UserResponse> response = authService.getUserLogged("token");
+
+    assertEquals("/user.png", response.getBody().getAvatar());
   }
 }
