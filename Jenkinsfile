@@ -65,23 +65,37 @@ pipeline {
         }
       }
       steps {
-        dir("${env.BASE_PATH}/${params.PROJECT_NAME}") {
-          sh './mvnw sonar:sonar'
+        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+          dir("${env.BASE_PATH}/${params.PROJECT_NAME}") {
+            sh '''
+              mkdir -p target/sonar
+              chmod -R u+rwX target/sonar
+              ./mvnw sonar:sonar -Dsonar.token="$SONAR_TOKEN"
+            '''
+          }
         }
       }
     }
 
-    // 3. Empaquetado (solo si las pruebas y cobertura son correctas)
-    stage('Package') {
+    // 3. Construcción de imagen Docker y publicación en Docker Hub
+    stage('Docker Build & Publish') {
       when {
         expression {
           currentBuild.currentResult == null || currentBuild.currentResult == 'SUCCESS' || currentBuild.currentResult == 'UNSTABLE'
         }
       }
+      environment {
+        PROJECT_NAME = "${params.PROJECT_NAME}"
+      }
       steps {
-        dir("${env.BASE_PATH}/${params.PROJECT_NAME}") {
-          sh './mvnw package -DskipTests'
-          archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+          dir("${env.BASE_PATH}/${params.PROJECT_NAME}") {
+            sh '''
+              echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+              docker build -t "$DOCKER_HUB_USERNAME/$PROJECT_NAME:latest" .
+              docker push "$DOCKER_HUB_USERNAME/$PROJECT_NAME:latest"
+            '''
+          }
         }
       }
     }
