@@ -10,7 +10,7 @@ pipeline {
   parameters {
     choice(
       name: 'PROJECT_NAME',
-      choices: ['api-gateway', 'auth-service', 'config-server', 'project-service', 'task-service'],
+      choices: ['api-gateway', 'auth-service', 'config-server', 'project-service', 'service-registry', 'task-service'],
       description: 'Selecciona el proyecto Spring Boot que quieres construir'
     )
   }
@@ -60,8 +60,15 @@ pipeline {
     // 2. Análisis en SonarQube (solo si las pruebas no fallaron)
     stage('SonarQube Analysis') {
       when {
-        expression {
-          currentBuild.currentResult == null || currentBuild.currentResult == 'SUCCESS' || currentBuild.currentResult == 'UNSTABLE'
+        allOf {
+          expression {
+            currentBuild.currentResult == null || currentBuild.currentResult == 'SUCCESS' || currentBuild.currentResult == 'UNSTABLE'
+          }
+          expression {
+            params.PROJECT_NAME != 'api-gateway' &&
+            params.PROJECT_NAME != 'config-server' &&
+            params.PROJECT_NAME != 'service-registry'
+          }
         }
       }
       steps {
