@@ -15,6 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -61,5 +62,38 @@ class UserControllerTest {
     assertEquals(200, response.getStatusCode().value());
     assertEquals("user@test.com", response.getBody().getEmail());
     verify(userService).findById("123");
+  }
+
+  @Test
+  void existUserNameShouldDelegateToUserService() {
+    when(userService.existUserName("neo")).thenReturn(ResponseEntity.ok(true));
+
+    ResponseEntity<Boolean> response = controller.existUserName("neo");
+
+    assertEquals(200, response.getStatusCode().value());
+    assertTrue(response.getBody());
+    verify(userService).existUserName("neo");
+  }
+
+  @Test
+  void searchUsersByEmailShouldDelegateToUserService() {
+    when(userService.searchUsersByEmail("neil")).thenReturn(ResponseEntity.ok(List.of()));
+
+    ResponseEntity<List<com.auth_service.dtos.UserEmailResponse>> response = controller.searchUsersByEmail("neil");
+
+    assertEquals(200, response.getStatusCode().value());
+    assertEquals(0, response.getBody().size());
+    verify(userService).searchUsersByEmail("neil");
+  }
+
+  @Test
+  void searchUsersByTeamShouldDelegateToUserService() {
+    when(userService.searchUsersByTeamIds(List.of("1", "2"))).thenReturn(ResponseEntity.ok(List.of()));
+
+    ResponseEntity<List<com.auth_service.dtos.UserEmailResponse>> response = controller.searchUsersByTeam(List.of("1", "2"));
+
+    assertEquals(200, response.getStatusCode().value());
+    assertEquals(0, response.getBody().size());
+    verify(userService).searchUsersByTeamIds(List.of("1", "2"));
   }
 }

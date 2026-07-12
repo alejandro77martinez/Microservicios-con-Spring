@@ -8,6 +8,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -46,5 +47,29 @@ class JwtServiceImplTest {
     void validateTokenShouldReturnFalseForMalformedToken() {
         JwtServiceImpl jwtService = new JwtServiceImpl();
         assertFalse(jwtService.validateToken("not-a-jwt"));
+    }
+
+    @Test
+    void refreshTokenShouldReturnEmptyForExpiredToken() {
+        JwtServiceImpl jwtService = new JwtServiceImpl();
+        ReflectionTestUtils.setField(jwtService, "secret", "12345678901234567890123456789012");
+        ReflectionTestUtils.setField(jwtService, "expiration", -1000L);
+        UserDetails user = new User(
+                "user@test.com",
+                "password",
+                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+
+        String token = jwtService.generateToken(user);
+
+        assertEquals("", jwtService.refreshToken(token));
+    }
+
+    @Test
+    void getUserFromTokenShouldReturnEmptyForMalformedToken() {
+        JwtServiceImpl jwtService = new JwtServiceImpl();
+        ReflectionTestUtils.setField(jwtService, "secret", "12345678901234567890123456789012");
+
+        assertEquals("", jwtService.getUserFromToken("not-a-jwt"));
     }
 }
